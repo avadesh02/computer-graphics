@@ -1,0 +1,3 @@
+/home/ameduri/Course_work/cg/Assignment_4/build/CMakeFiles/rebuild_cache.dir
+/home/ameduri/Course_work/cg/Assignment_4/build/CMakeFiles/assignment4.dir
+/home/ameduri/Course_work/cg/Assignment_4/build/CMakeFiles/edit_cache.dir

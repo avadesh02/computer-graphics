@@ -56,11 +56,6 @@
 	],
 	"Objects": [
 		{
-			"Type": "Mesh",
-			"Material": 0,
-			"Path": "dragon.off"
-		},
-		{
 			"Type": "Sphere",
 			"Material": 0,
 			"Position": [5, 0, 0],

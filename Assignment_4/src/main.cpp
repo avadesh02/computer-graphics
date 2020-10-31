@@ -180,12 +180,73 @@ AABBTree::AABBTree(const MatrixXd &V, const MatrixXi &F) {
 		centroids.row(i) /= F.cols();
 	}
 
+	int n = 3;
+	std::vector<int> S;
+
+	// initialising the leafs of the AABB tree for bottom up approach
+
+	for (unsigned i = 0; i < n; i ++){
+		Node new_node;
+		new_node.bbox = bbox_triangle(V.row(F(i, 0)), V.row(F(i, 1)), V.row(F(i, 2)));
+		new_node.triangle = i;
+		new_node.left = -1;
+		new_node.right = -1;
+		S.push_back(i);
+		nodes.push_back(new_node);
+	}
+
+	while(S.size() != 1){
+		
+		for (unsigned i = 0; i < S.size() - 1; i ++){
+			double min_dist = 100000;
+			int closest_box = -1;
+			// std::cout << S[i] << "ana" <<'\n';
+			for (unsigned j = i + 1; j < S.size(); j ++){
+				if (nodes[S[i]].bbox.squaredExteriorDistance(nodes[S[j]].bbox) < min_dist)
+				{
+					closest_box = j;
+					min_dist = nodes[S[i]].bbox.squaredExteriorDistance(nodes[S[j]].bbox);
+					if (min_dist == 0){
+						break;
+					}
+				}
+			}
+			Node new_node;
+			new_node.bbox.extend(nodes[S[i]].bbox);
+			new_node.bbox.extend(nodes[S[closest_box]].bbox);
+			new_node.left = S[i];
+			new_node.right = S[closest_box];
+			new_node.triangle = -1;
+			nodes.push_back(new_node);
+			nodes[S[i]].parent = nodes.size() - 1;
+			nodes[S[closest_box]].parent = nodes.size() - 1;
+
+			// adding the latest node
+			S[i] = nodes.size() - 1;
+			// removing the node that has been merged
+			S.erase(S.begin() + closest_box);
+		}
+	}
+	nodes[nodes.size() - 1].parent = -1;
+
+	// for(unsigned i= 0; i < nodes.size(); i ++){
+	// 	std::cout << "node - " << i << " : ";
+	// 	std::cout << nodes[i].parent << " ";
+	// 	std::cout << nodes[i].left << " ";
+	// 	std::cout << nodes[i].right << " ";
+	// 	std::cout << nodes[i].triangle << '\n' ;
+	// 	std::cout << nodes[i].bbox.max() ;
+	// 	std::cout << nodes[i].bbox.min() << "\n";
+	// 	}
+
 	// TODO (Assignment 3)
 
 	// Method (1): Top-down approach.
 	// Split each set of primitives into 2 sets of roughly equal size,
 	// based on sorting the centroids along one direction or another.
-
+	// Node parent;
+	// parent.bbox.
+	
 	// Method (2): Bottom-up approach.
 	// Merge nodes 2 by 2, starting from the leaves of the forest, until only 1 tree is left.
 }
@@ -310,18 +371,55 @@ bool intersect_box(const Ray &ray, const AlignedBox3d &box) {
 	// There is no need to set the resulting normal and ray parameter, since
 	// we are not testing with the real surface here anyway.
 
+
 	return false;
 }
 
 bool Mesh::intersect(const Ray &ray, Intersection &closest_hit) {
 	// TODO (Assignment 3)
-
 	// Method (1): Traverse every triangle and return the closest hit.
+	bool speed_up = false;
+	if(!speed_up){
+		Intersection current_hit;
+		int closest_index = -1;
+		for (unsigned i = 0; i < facets.rows(); i++)
+		{
+			if (intersect_triangle(ray, vertices.row(facets(i, 0)), vertices.row(facets(i, 1)), vertices.row(facets(i, 2)), current_hit))
+			{
+				if (closest_index >= 0)
+				{
+					if ((ray.origin - current_hit.position).squaredNorm() < (ray.origin - closest_hit.position).squaredNorm())
+					{
+						closest_hit = current_hit;
+						closest_index = i;
+					}
+				}
+				else
+				{
+					closest_index = i;
+					closest_hit = current_hit;
+				}
+			}
+		}
+		if (closest_index < 0)
+		{
+			// Returning false since ray does not hit any triangle in the mesh
+			return false;
+		}
+		else
+		{
+			// returning true becuase ray hits a triangle in the mesh
+			return true;
+		}
+	}
+	else{
+		// Method (2): Traverse the BVH tree and test the intersection with a
+		// triangles at the leaf nodes that intersects the input ray.
 
-	// Method (2): Traverse the BVH tree and test the intersection with a
-	// triangles at the leaf nodes that intersects the input ray.
+		// return false;
+	}
 
-	return false;
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -352,23 +450,107 @@ Vector3d ray_color(const Scene &scene, const Ray &ray, const Object &obj, const 
 
 		// TODO (Assignment 2, shadow rays)
 		// if (is_light_visible(scene, light, hit)){
-		Vector3d diffuse = mat.diffuse_color * std::max(Li.dot(N), 0.0);
+			Vector3d diffuse = mat.diffuse_color * std::max(Li.dot(N), 0.0);
 
-		// TODO: Specular contribution
-		Vector3d specular = mat.specular_color * pow(std::max(N.dot(bisector), 0.0), mat.specular_exponent);
+			// TODO: Specular contribution
+			Vector3d specular = mat.specular_color * pow(std::max(N.dot(bisector), 0.0), mat.specular_exponent);
 
-		// Attenuate lights according to the squared distance to the lights
-		Vector3d D = light.position - hit.position;
-		lights_color += (diffuse + specular).cwiseProduct(light.intensity) /  D.squaredNorm();
+			// Attenuate lights according to the squared distance to the lights
+			Vector3d D = light.position - hit.position;
+			lights_color += (diffuse + specular).cwiseProduct(light.intensity) /  D.squaredNorm();
 		// }
 	}
 
 	// TODO (Assignment 2, reflected ray)
 	Vector3d reflection_color(0, 0, 0);
+	Ray reflected_ray;
+	Intersection reflected_hit;
+	reflected_ray.origin = hit.position;
+	// computing the reflected ray direction using the formula discussed in class
+	reflected_ray.direction = ray.direction - 2 * hit.normal * ((hit.normal).dot(ray.direction));
+	// offseting the reflected ray slightly to make sure there is no collision with the same object it reflects from
+	reflected_ray.origin += 0.001 * reflected_ray.direction;
+
+	for (unsigned i = 0; i < max_bounce; i++)
+	{
+		// running the loop for a maximum of max_bounce
+		if (Object *obj = find_nearest_object(scene, reflected_ray, reflected_hit))
+		{
+			for (const Light &light : scene.lights)
+			{
+				// computing bisector for the specular shading for the reflected ray
+				Vector3d bisector = ((light.position - reflected_hit.position) - reflected_ray.direction).normalized();
+				Vector3d N = reflected_hit.normal;
+
+				// TODO: Shoot a shadow ray to determine if the light should affect the intersection point
+				if (is_light_visible(scene, light, hit))
+				{
+					// had to reduce the shinning constant to make the reflection of the spheres more prominent
+					// otherwise the resulting figure did not match the figure shown in the github repp
+					Vector3d specular = mat.reflection_color * pow(std::max(N.dot(bisector), 0.0), 5);
+
+					// Attenuate lights according to the squared distance to the lights
+					Vector3d D = light.position - reflected_hit.position;
+					reflection_color += (specular).cwiseProduct(light.intensity) / D.squaredNorm();
+				}
+			}
+			reflected_ray.origin = reflected_hit.position;
+			// computing the reflected ray direction using the formula discussed in class
+			reflected_ray.direction = reflected_ray.direction - 2 * reflected_hit.normal * ((reflected_hit.normal).dot(reflected_ray.direction));
+			// offseting the reflected ray slightly to make sure there is no collision with the same object it reflects from
+			reflected_ray.origin += 0.001 * reflected_ray.direction;
+		}
+		else
+		{
+			// if reflected ray does not intersect any object terminate loop
+			break;
+		}
+	}
 
 	// TODO (Assignment 2, refracted ray)
 	Vector3d refraction_color(0, 0, 0);
+	Ray refracted_ray;
+	Intersection refracted_hit;
+	refracted_ray.origin = hit.position;
+	const double ri = mat.refraction_index;
+	refracted_ray.direction = ri * ray.direction + (ri * (hit.normal.normalized().dot(ray.direction.normalized())) - sqrt(1 - ri * ri * (1 - pow(hit.normal.normalized().dot(ray.direction.normalized()), 2)))) * hit.normal;
+	refracted_ray.origin += 0.001 * refracted_ray.direction;
 
+	for (unsigned i = 0; i < max_bounce; i++)
+	{
+		if (Object *obj = find_nearest_object(scene, refracted_ray, refracted_hit))
+		{
+			for (const Light &light : scene.lights)
+			{
+				Vector3d bisector = ((light.position - refracted_hit.position) - refracted_ray.direction).normalized();
+				Vector3d N = refracted_hit.normal;
+
+				// checking for total internal reflection
+				if (refracted_ray.direction.dot(N) < 0)
+				{
+					break;
+				}
+
+				// TODO: Shoot a shadow ray to determine if the light should affect the intersection point
+				if (is_light_visible(scene, light, hit))
+				{
+					// had to reduce the shinning constant to make the reflection of the spheres more prominent
+					Vector3d specular = mat.refraction_color * pow(std::max(N.dot(bisector), 0.0), 5);
+
+					// Attenuate lights according to the squared distance to the lights
+					Vector3d D = light.position - refracted_hit.position;
+					refraction_color += (specular).cwiseProduct(light.intensity) / D.squaredNorm();
+				}
+			}
+			refracted_ray.origin = refracted_hit.position;
+			refracted_ray.direction = ri * refracted_ray.direction + (ri * (refracted_hit.normal.normalized().dot(refracted_ray.direction.normalized())) - sqrt(1 - ri * ri * (1 - pow(refracted_hit.normal.normalized().dot(refracted_ray.direction.normalized()), 2)))) * refracted_hit.normal;
+			refracted_ray.origin += 0.001 * refracted_ray.direction;
+		}
+		else
+		{
+			break;
+		}
+	}
 	// Rendering equation
 	Vector3d C = ambient_color + lights_color + reflection_color + refraction_color;
 
@@ -437,7 +619,6 @@ bool is_light_visible(const Scene &scene, const Light &light, const Intersection
 Vector3d shoot_ray(const Scene &scene, const Ray &ray, int max_bounce) {
 	Intersection hit;
 	if (Object * obj = find_nearest_object(scene, ray, hit)) {
-		std::cout << "yes" << '\n';
 		// 'obj' is not null and points to the object of the scene hit by the ray
 		return ray_color(scene, ray, *obj, hit, max_bounce);
 	} else {
@@ -474,7 +655,7 @@ void render_scene(const Scene &scene) {
 
 	// for depth of field
 	// number of rays cast per pixel
-	int no_rays = 2;
+	int no_rays = 1;
 
     const float MIN_RAND = -0.0, MAX_RAND = 0.0;
 	const float range = MAX_RAND - MIN_RAND;
@@ -585,10 +766,9 @@ Scene load_scene(const std::string &filename) {
 			// TODO
 		} else if (entry["Type"] == "Mesh") {
 			// Load mesh from a file
-			std:: cout << "1" ;
 			std::string filename = std::string(DATA_DIR) + entry["Path"].get<std::string>();
-			std::cout << "2";
 			object = std::make_shared<Mesh>(filename);
+			break;
 		}
 		object->material = scene.materials[entry["Material"]];
 		scene.objects.push_back(object);

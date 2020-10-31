@@ -56,6 +56,11 @@
 	],
 	"Objects": [
 		{
+			"Type": "Mesh",
+			"Material": 0,
+			"Path": "bunny.off"
+		},
+		{
 			"Type": "Sphere",
 			"Material": 0,
 			"Position": [5, 0, 0],

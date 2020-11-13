@@ -92,6 +92,9 @@
         "vec4s": "cpp",
         "vec4ub": "cpp",
         "vec4ui": "cpp",
-        "vec4us": "cpp"
+        "vec4us": "cpp",
+        "mixinvector": "cpp",
+        "buffered_value": "cpp",
+        "core": "cpp"
     }
 }

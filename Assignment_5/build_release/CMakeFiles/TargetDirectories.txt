@@ -1,0 +1,3 @@
+/home/ameduri/Course_work/cg/Assignment_5/build_release/CMakeFiles/rebuild_cache.dir
+/home/ameduri/Course_work/cg/Assignment_5/build_release/CMakeFiles/assignment5.dir
+/home/ameduri/Course_work/cg/Assignment_5/build_release/CMakeFiles/edit_cache.dir

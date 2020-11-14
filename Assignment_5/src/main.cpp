@@ -47,15 +47,14 @@ int main()
 	// The vertex shader is the identity
 	program.VertexShader = [](const VertexAttributes& va, const UniformAttributes& uniform)
 	{
-		Vector4d transformed_va;
-		for (unsigned i = 0; i < 3; i ++){
-			transformed_va[i] = va.position[i];
+		Vector4f transformed_vector;
+		for(unsigned i = 0; i < 3; i ++){
+			transformed_vector[i] = va.position[i];
 		}
-		transformed_va[3] = 1;
-		// transformed_va = uniform.M*transformed_va;
+		transformed_vector[3] = 1;
+		transformed_vector = uniform.M*transformed_vector;
 		//replacing 4th co-ordinate with alpha
-		// return VertexAttributes(transformed_va[0],transformed_va[1],transformed_va[2]);
-		return va;
+		return VertexAttributes(transformed_vector[0],transformed_vector[1],transformed_vector[2], va.position[3]);
 	};
 
 	// The fragment shader uses a fixed color
@@ -71,9 +70,9 @@ int main()
 	};
 
 	// initialising camera attributes before rendering mesh
-	uniform.camera.position << 0,0,2;
+	uniform.camera.position << 0,0,-2;
 	uniform.camera.gaze_direction << 0,0,-1;
-	uniform.camera.view_up << 1,0,0;
+	uniform.camera.view_up << 0,1,0;
 	uniform.camera.is_perspective = false;
 
 	// loading the mesh
@@ -88,23 +87,11 @@ int main()
 	for (unsigned i = 0; i < F.rows(); i++){
 		for (unsigned j = 0; j < F.cols(); j ++){
 			vertices_mesh.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
-			if (!uniform.camera.is_perspective){
-				// finding bounding box for orthographic camera
-				// assuming that the camera is aligned with world axis	
-				Vector3d vertex(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2));
-				uniform.camera.box.extend(vertex);
-			}
 		}
 	}
 	
 	// computing the transformation matrices
-	uniform.lbn = uniform.camera.box.min();
-	uniform.rtf = uniform.camera.box.max();
-	uniform.M_orth << 2/(uniform.rtf(0) - uniform.lbn(0)), 0, 0, -(uniform.rtf(0) + uniform.lbn(0))/(uniform.rtf(0) - uniform.lbn(0)),
-				0, 2/(uniform.rtf(1) - uniform.lbn(1)), 0, -(uniform.rtf(1) + uniform.lbn(1))/(uniform.rtf(1) - uniform.lbn(1)),
-				0, 0, -2/(uniform.rtf(2) - uniform.lbn(2)), (uniform.rtf(2) + uniform.lbn(2))/(uniform.rtf(2) - uniform.lbn(2)),
-				0, 0, 0, 1;
-
+	// computing transformation from wold to camera
 	Vector3d w, u, v;
 	w = -uniform.camera.gaze_direction.normalized();
 	u = (uniform.camera.view_up.cross(w)).normalized();
@@ -118,19 +105,35 @@ int main()
 
 	uniform.M_cam = tmp.inverse();
 
+	// compututing transformation from camera view to cannoincal view volume
+	if (!uniform.camera.is_perspective){
+		Vector4f lbn_world, rtf_world;
+		for (unsigned i = 0; i < V.cols() ; i ++){
+			lbn_world[i] = V.col(i).minCoeff();
+			rtf_world[i] = V.col(i).maxCoeff();
+			
+		}
+		lbn_world[3] = 1; rtf_world[3] = 1;
+		// tranforming from world to camera frame
+		uniform.lbn = (uniform.M_cam*lbn_world).head(3);
+		uniform.rtf = (uniform.M_cam*rtf_world).head(3);
+		// computing M_orth
+		// not doing (n - f) here since, the bounded box limits are already transformed to the right axis before while
+		// transforming the bounding box from the world frame to the camera frame
+		uniform.M_orth << 2/(uniform.rtf(0) - uniform.lbn(0)), 0, 0, -(uniform.rtf(0) + uniform.lbn(0))/(uniform.rtf(0) - uniform.lbn(0)),
+					0, 2/(uniform.rtf(1) - uniform.lbn(1)), 0, -(uniform.rtf(1) + uniform.lbn(1))/(uniform.rtf(1) - uniform.lbn(1)),
+					0, 0, -2/(uniform.lbn(2) - uniform.rtf(2)), (uniform.rtf(2) + uniform.lbn(2))/(uniform.lbn(2) - uniform.rtf(2)),
+					0, 0, 0, 1;
+	}
+	else{
+		// to do for perspective
+	}
+	
 	// M_vp is not computed as it is carried out in the rasterize triangle part
 	// M_object to world is assumed to be identity 
 	uniform.M = uniform.M_orth*uniform.M_cam;
 
-	std::cout << uniform.M*vertices_mesh[0].position;
-
-	vector<VertexAttributes> vertices;
-	
-	vertices.push_back(VertexAttributes(-1,-1,0));
-	vertices.push_back(VertexAttributes(1,-1,0));
-	vertices.push_back(VertexAttributes(0,0,0));
-
-	rasterize_triangles(program,uniform,vertices,frameBuffer);
+	rasterize_triangles(program,uniform,vertices_mesh,frameBuffer);
 
 	vector<uint8_t> image;
 	framebuffer_to_uint8(frameBuffer,image);

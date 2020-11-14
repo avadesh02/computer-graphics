@@ -63,11 +63,10 @@ class UniformAttributes
 		double field_of_view; // between 0 and PI
 		double focal_length;
 		double lens_radius; // for depth of fieldlo
-		Eigen::AlignedBox3d box; // bounding box of mesh when using orthographic projection to compute (l,b,n), (r,t,f) 
 	};
 	public:
 		Camera camera;
 		Eigen::Matrix4f M_orth, M_cam, M_model, M;
-		Eigen::Vector3d lbn, rtf; // lower and upper limit of camera view
+		Eigen::Vector3f lbn, rtf; // lower and upper limit of camera view
 	
 };

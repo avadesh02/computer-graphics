@@ -24,10 +24,12 @@ class VertexAttributes
     {
         VertexAttributes r;
         r.position = alpha*a.position + beta*b.position + gamma*c.position;
+		r.normal =  alpha*a.normal + beta*b.normal + gamma*c.normal;
         return r;
     }
 
 	Eigen::Vector4f position;
+	Eigen::Vector3f normal;
 };
 
 class FragmentAttributes
@@ -39,6 +41,7 @@ class FragmentAttributes
 	}
 
 	Eigen::Vector4f color;
+	float depth;
 };
 
 class FrameBufferAttributes
@@ -50,6 +53,7 @@ class FrameBufferAttributes
 	}
 
 	Eigen::Matrix<uint8_t,4,1> color;
+	float depth = -1000;
 };
 
 class UniformAttributes
@@ -66,7 +70,15 @@ class UniformAttributes
 	};
 	public:
 		Camera camera;
-		Eigen::Matrix4f M_orth, M_cam, M_model, M;
+		bool draw_wireframe; // draws wireframe
+		bool flat_shading;
+		bool per_vertex_shading;
+		Eigen::Matrix4f M_orth, M_cam, M_model, M, M_inv;
 		Eigen::Vector3f lbn, rtf; // lower and upper limit of camera view
+		Eigen::Vector4f color;
+		Eigen::Vector3f light_source;
+
+		Eigen::Vector3f diffuse_color, specular_color;
+		float specular_exponent;
 	
 };

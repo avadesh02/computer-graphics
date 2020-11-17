@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_FLAGS =   -std=gnu++11
 
-CXX_DEFINES = -DDATA_DIR=\"/home/ameduri/Course_work/cg/Assignment_5/data/\"
+CXX_DEFINES = -DDATA_DIR=\"/home/ameduri/course_work/computer-graphics/Assignment_5/data/\"
 
-CXX_INCLUDES = -isystem /home/ameduri/Course_work/cg/Assignment_5/../ext/eigen -isystem /home/ameduri/Course_work/cg/Assignment_5/../ext/gif-h -isystem /home/ameduri/Course_work/cg/Assignment_5/../ext/stb 
+CXX_INCLUDES = -isystem /home/ameduri/course_work/computer-graphics/Assignment_5/../ext/eigen -isystem /home/ameduri/course_work/computer-graphics/Assignment_5/../ext/gif-h -isystem /home/ameduri/course_work/computer-graphics/Assignment_5/../ext/stb 
 

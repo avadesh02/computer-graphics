@@ -215,9 +215,9 @@ CMakeFiles/assignment5.dir/src/main.cpp.o
  ../../ext/eigen/Eigen/src/plugins/MatrixCwiseBinaryOps.h
  ../../ext/eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h
  ../../ext/stb/stb_image_write.h
- /home/ameduri/Course_work/cg/Assignment_5/src/attributes.h
- /home/ameduri/Course_work/cg/Assignment_5/src/main.cpp
- /home/ameduri/Course_work/cg/Assignment_5/src/raster.h
+ /home/ameduri/course_work/computer-graphics/Assignment_5/src/attributes.h
+ /home/ameduri/course_work/computer-graphics/Assignment_5/src/main.cpp
+ /home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.h
 CMakeFiles/assignment5.dir/src/raster.cpp.o
  ../../ext/eigen/Eigen/Cholesky
  ../../ext/eigen/Eigen/Core
@@ -431,6 +431,6 @@ CMakeFiles/assignment5.dir/src/raster.cpp.o
  ../../ext/eigen/Eigen/src/plugins/CommonCwiseUnaryOps.h
  ../../ext/eigen/Eigen/src/plugins/MatrixCwiseBinaryOps.h
  ../../ext/eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h
- /home/ameduri/Course_work/cg/Assignment_5/src/attributes.h
- /home/ameduri/Course_work/cg/Assignment_5/src/raster.cpp
- /home/ameduri/Course_work/cg/Assignment_5/src/raster.h
+ /home/ameduri/course_work/computer-graphics/Assignment_5/src/attributes.h
+ /home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.cpp
+ /home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.h

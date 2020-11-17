@@ -1080,7 +1080,7 @@ math.h
 assert.h
 -
 
-/home/ameduri/Course_work/cg/Assignment_5/src/attributes.h
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/attributes.h
 Eigen/Core
 -
 Eigen/Dense
@@ -1088,7 +1088,7 @@ Eigen/Dense
 Eigen/Geometry
 -
 
-/home/ameduri/Course_work/cg/Assignment_5/src/main.cpp
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/main.cpp
 iostream
 -
 string
@@ -1098,17 +1098,17 @@ vector
 fstream
 -
 raster.h
-/home/ameduri/Course_work/cg/Assignment_5/src/raster.h
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.h
 stb_image_write.h
-/home/ameduri/Course_work/cg/Assignment_5/src/stb_image_write.h
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/stb_image_write.h
 
-/home/ameduri/Course_work/cg/Assignment_5/src/raster.cpp
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.cpp
 raster.h
-/home/ameduri/Course_work/cg/Assignment_5/src/raster.h
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.h
 iostream
 -
 
-/home/ameduri/Course_work/cg/Assignment_5/src/raster.h
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.h
 Eigen/Core
 -
 Eigen/LU
@@ -1118,5 +1118,5 @@ vector
 string
 -
 attributes.h
-/home/ameduri/Course_work/cg/Assignment_5/src/attributes.h
+/home/ameduri/course_work/computer-graphics/Assignment_5/src/attributes.h
 

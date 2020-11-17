@@ -106,9 +106,9 @@ int main()
 	uniform.camera.gaze_direction << 0,0,-1;
 	uniform.camera.view_up << 0,1,0;
 	uniform.camera.is_perspective = false;
-	uniform.draw_wireframe = true;
-	uniform.flat_shading = true;
-	uniform.per_vertex_shading = false;
+	uniform.draw_wireframe = false;
+	uniform.flat_shading = false;
+	uniform.per_vertex_shading = true;
 
 	uniform.color << 1,0,0,1;
 	uniform.light_source << 0,2,2;
@@ -120,9 +120,20 @@ int main()
 	MatrixXd V;
 	MatrixXi F;
 	std::string filename = "../data/bunny.off" ;
-
+	MatrixXf V_p;
 	load_off(filename, V, F);
-
+	if (uniform.per_vertex_shading){
+		V_p.resize(V.rows(), V.cols());
+		V_p.setZero();
+		for (unsigned i = 0; i < F.rows(); i++){
+			Vector3f u, v;
+			u = V.row((F(i, 0))).cast <float> () - V.row(F(i, 1)).cast <float> ();
+			v = V.row((F(i, 2))).cast <float> () - V.row(F(i, 1)).cast <float> ();
+			V_p.row(F(i, 0)) = (-u.cross(v)).normalized();
+			V_p.row(F(i, 1)) = (-u.cross(v)).normalized();
+			V_p.row(F(i, 2)) = (-u.cross(v)).normalized();
+		}
+	}
 	// pushing triangle information into vertices
 	vector<VertexAttributes> vertices_mesh;
 	// pushing line information into vertices
@@ -153,12 +164,10 @@ int main()
 			vertices_mesh[3*i+2].normal = (-u.cross(v)).normalized(); 
 		}
 		if (uniform.per_vertex_shading){
-			Vector3f u,v;
-			u = vertices_mesh[3*i].position.head(3) - vertices_mesh[3*i + 1].position.head(3); 
-			v = vertices_mesh[3*i + 2].position.head(3) - vertices_mesh[3*i + 1].position.head(3);
-			vertices_mesh[3*i].normal += (-u.cross(v)).normalized(); 
-			vertices_mesh[3*i+1].normal += (-u.cross(v)).normalized(); 
-			vertices_mesh[3*i+2].normal += (-u.cross(v)).normalized(); 	
+			
+			vertices_mesh[3*i].normal = V_p.row(F(i,0)).normalized(); 
+			vertices_mesh[3*i+1].normal = V_p.row(F(i,1)).normalized();
+			vertices_mesh[3 * i + 2].normal = V_p.row(F(i, 2)).normalized();
 			// not normalising the average since this is done in the vertex shader
 		}
 	}
@@ -206,16 +215,13 @@ int main()
 	// M_vp is not computed as it is carried out in the rasterize triangle part
 	// M_object to world is assumed to be identity 
 	uniform.M = uniform.M_orth*uniform.M_cam;
-	// uniform.M << 1,0,0,0,
-	// 			0,1,0,0,
-	// 			0,0,1,0,
-	// 			0,0,0,1;
+	uniform.M_inv = uniform.M.inverse();
 	// storing the inverse to tranform normals computed at each vertex into the canonical view volume space
-	uniform.M_inv = uniform.M.inverse(); 
-	
+	uniform.M_cam_inv = uniform.M_cam.inverse(); 
+	uniform.M_orth_inv = uniform.M_orth.inverse();
 	Vector4f camera_location;
 	camera_location << uniform.light_source(0), uniform.light_source(1), uniform.light_source(2), 1;
-	// bringing light source into the canonical view volume frame
+	// bringing light source into the view volume frame
 	uniform.light_source = (uniform.M*camera_location).head(3);
 
 	// First triangle
@@ -230,11 +236,13 @@ int main()
 	vertices_2.push_back(VertexAttributes(1,-1,0.5));
 	vertices_2.push_back(VertexAttributes(1,1,0.5));
 
-
-	rasterize_triangles(program,uniform,vertices_mesh,frameBuffer);
-	// rasterize_triangles(program,uniform,vertices_2,frameBuffer);
-	rasterize_lines(program, uniform, vertices_lines, 1.0, frameBuffer);
-
+	if(uniform.flat_shading || uniform.per_vertex_shading){
+		rasterize_triangles(program, uniform, vertices_mesh, frameBuffer);
+	}
+	if (uniform.draw_wireframe){
+		rasterize_lines(program, uniform, vertices_lines, 1.0, frameBuffer);
+	}
+	
 	vector<uint8_t> image;
 	framebuffer_to_uint8(frameBuffer,image);
 	stbi_write_png("triangle.png", frameBuffer.rows(), frameBuffer.cols(), 4, image.data(), frameBuffer.rows()*4);

@@ -4,14 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/ameduri/Course_work/cg/Assignment_5/src/main.cpp" "/home/ameduri/Course_work/cg/Assignment_5/build/CMakeFiles/assignment5.dir/src/main.cpp.o"
-  "/home/ameduri/Course_work/cg/Assignment_5/src/raster.cpp" "/home/ameduri/Course_work/cg/Assignment_5/build/CMakeFiles/assignment5.dir/src/raster.cpp.o"
+  "/home/ameduri/course_work/computer-graphics/Assignment_5/src/main.cpp" "/home/ameduri/course_work/computer-graphics/Assignment_5/build/CMakeFiles/assignment5.dir/src/main.cpp.o"
+  "/home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.cpp" "/home/ameduri/course_work/computer-graphics/Assignment_5/build/CMakeFiles/assignment5.dir/src/raster.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_CXX
-  "DATA_DIR=\"/home/ameduri/Course_work/cg/Assignment_5/data/\""
+  "DATA_DIR=\"/home/ameduri/course_work/computer-graphics/Assignment_5/data/\""
   )
 
 # The include file search paths:

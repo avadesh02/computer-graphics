@@ -107,8 +107,8 @@ int main()
 	uniform.camera.view_up << 0,1,0;
 	uniform.camera.is_perspective = false;
 	uniform.draw_wireframe = true;
-	uniform.flat_shading = false;
-	uniform.per_vertex_shading = true;
+	uniform.flat_shading = true;
+	uniform.per_vertex_shading = false;
 
 	uniform.color << 1,0,0,1;
 	uniform.light_source << 0,2,2;
@@ -117,7 +117,7 @@ int main()
 	uniform.specular_exponent = 265.0;
 
 	// loading the mesh
-	MatrixXd V, V_N;
+	MatrixXd V;
 	MatrixXi F;
 	std::string filename = "../data/bunny.off" ;
 
@@ -143,7 +143,7 @@ int main()
 		if (uniform.draw_wireframe){
 			vertices_lines.push_back(VertexAttributes(V(F(i,0),0),V(F(i,0),1),V(F(i,0),2)));
 		}
-		if (uniform.flat_shading || uniform.per_vertex_shading){
+		if (uniform.flat_shading){
 			// computing the face normals
 			Vector3f u,v;
 			u = vertices_mesh[3*i].position.head(3) - vertices_mesh[3*i + 1].position.head(3); 
@@ -152,6 +152,7 @@ int main()
 			vertices_mesh[3*i+1].normal = (-u.cross(v)).normalized(); 
 			vertices_mesh[3*i+2].normal = (-u.cross(v)).normalized(); 
 		}
+		if (uniform.per_vertex_shading){
 			Vector3f u,v;
 			u = vertices_mesh[3*i].position.head(3) - vertices_mesh[3*i + 1].position.head(3); 
 			v = vertices_mesh[3*i + 2].position.head(3) - vertices_mesh[3*i + 1].position.head(3);
@@ -160,7 +161,8 @@ int main()
 			vertices_mesh[3*i+2].normal += (-u.cross(v)).normalized(); 	
 			// not normalising the average since this is done in the vertex shader
 		}
-
+	}
+	
 	// computing the transformation matrices
 	// computing transformation from wold to camera
 	Vector3d w, u, v;

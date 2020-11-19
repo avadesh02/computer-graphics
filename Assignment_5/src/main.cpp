@@ -45,42 +45,51 @@ int main()
 	Program program;
 
 	// The vertex shader is the identity
-	program.VertexShader = [](const VertexAttributes& va, const UniformAttributes& uniform)
-	{
-		Vector4f transformed_vector, transformed_normal;
-		for(unsigned i = 0; i < 3; i ++){
+	program.VertexShader = [](const VertexAttributes &va, const UniformAttributes &uniform) {
+		Vector3f Li = (uniform.light_source - va.position.head(3)).normalized();
+		// Vector3f bisector = ((uniform.light_source - va.position.head(3)) - uniform.camera.gaze_direction).normalized();
+		Vector3f diffuse, specular, color;
+		if (uniform.light_source.dot(va.normal) > 0)
+		{
+			diffuse = uniform.diffuse_color * (Li.dot(va.normal));
+		}
+		else
+		{
+			diffuse = uniform.diffuse_color * 0.0;
+		}
+		// implement specular
+		// specular = uniform.specular_color * pow(std::max(va.normal.dot(bisector), 0.0), uniform.specular_exponent);
+
+		color = uniform.ambient_color + diffuse;
+
+		// rotating the object and translating around the barycenter
+
+
+
+		Vector4f transformed_vector;
+
+		for(unsigned i = 0; i < 3; i ++)
+		{
 			transformed_vector[i] = va.position[i];
-			transformed_normal[i] = va.normal[i];
 		}
 		transformed_vector[3] = 1;
-		transformed_normal[3] = 1;
+		transformed_vector = uniform.bc_rot_tran*transformed_vector;
 		transformed_vector = uniform.M*transformed_vector;
 		// transforming normal at the vertex into the canonical view volume space
-		transformed_normal = uniform.M_inv*transformed_normal;
 		//replacing 4th co-ordinate with alpha
 		VertexAttributes out(transformed_vector[0],transformed_vector[1],transformed_vector[2], va.position[3]);
-		out.normal = transformed_normal.head(3).normalized();
+		out.normal = va.normal;
+		out.color.head(3) = color;
+		out.color[3] = uniform.color(3);
 		return out;
 	};
 
 	// The fragment shader uses a fixed color
 	program.FragmentShader = [](const VertexAttributes& va, const UniformAttributes& uniform)
 	{
-		Vector3f Li = -(va.position.head(3) - uniform.light_source).normalized();
-		// Vector3f bisector = ((uniform.light_source - va.position.head(3)) - uniform.).normalized()
-		Vector3f diffuse, specular, color;
-		if (uniform.light_source.dot(va.normal) > 0){
-			diffuse = uniform.diffuse_color * (Li.dot(va.normal));
-		}
-		else{
-			diffuse = uniform.diffuse_color * 0.0;
-		}
-		// implement specular 
-		// specular = uniform.specular_color * pow(std::max(va.normal.dot(bisector), 0.0), uniform.specular_exponent);
-		
-		color = diffuse;
+
 		// FragmentAttributes out(uniform.color(0),uniform.color(1),uniform.color(2),uniform.color(3));
-		FragmentAttributes out(color(0),color(1),color(2),uniform.color(3));
+		FragmentAttributes out(va.color(0),va.color(1),va.color(2),uniform.color(3));
 
 		out.depth = va.position[2];
 		return out;
@@ -107,33 +116,68 @@ int main()
 	uniform.camera.view_up << 0,1,0;
 	uniform.camera.is_perspective = false;
 	uniform.draw_wireframe = false;
-	uniform.flat_shading = false;
-	uniform.per_vertex_shading = true;
+	uniform.flat_shading = true;
+	uniform.per_vertex_shading = false;
 
 	uniform.color << 1,0,0,1;
 	uniform.light_source << 0,2,2;
-	uniform.diffuse_color << 0.8, 0.8, 0.8;
+	uniform.diffuse_color << 0.4, 0.4, 0.4;
 	uniform.specular_color << 0.2, 0.2, 0.2;
 	uniform.specular_exponent = 265.0;
+	uniform.ambient_color << 0.2, 0.2, 0.2;
+
 
 	// loading the mesh
 	MatrixXd V;
 	MatrixXi F;
 	std::string filename = "../data/bunny.off" ;
 	MatrixXf V_p;
+
+	Vector3f traingle_center;
+	double area = 0, triangle_area;
+	uniform.bary_center.setZero();
+
+	V_p.resize(V.rows(), V.cols());
+	V_p.setZero();
 	load_off(filename, V, F);
-	if (uniform.per_vertex_shading){
-		V_p.resize(V.rows(), V.cols());
-		V_p.setZero();
-		for (unsigned i = 0; i < F.rows(); i++){
-			Vector3f u, v;
-			u = V.row((F(i, 0))).cast <float> () - V.row(F(i, 1)).cast <float> ();
-			v = V.row((F(i, 2))).cast <float> () - V.row(F(i, 1)).cast <float> ();
+	
+	for (unsigned i = 0; i < F.rows(); i++){
+		Vector3f u, v;
+		// computing bary center of object
+		u = V.row((F(i, 0))).cast <float> () - V.row(F(i, 1)).cast <float> ();
+		v = V.row((F(i, 2))).cast <float> () - V.row(F(i, 1)).cast <float> ();
+		triangle_area = 0.5*(u.cross(v).norm());
+		traingle_center = (1/3.0)*(V.row((F(i, 0))).cast<float>() + V.row(F(i, 1)).cast<float>() + V.row(F(i, 1)).cast<float>());
+		uniform.bary_center.head(3) += traingle_center*triangle_area;
+		area += triangle_area;
+
+		if (uniform.per_vertex_shading)
+		// computing average normal at each vertex for per vertex shading
+		{
 			V_p.row(F(i, 0)) = (-u.cross(v)).normalized();
 			V_p.row(F(i, 1)) = (-u.cross(v)).normalized();
 			V_p.row(F(i, 2)) = (-u.cross(v)).normalized();
 		}
 	}
+
+	uniform.bary_center.head(3) = uniform.bary_center.head(3)/area;
+	uniform.bary_center[3] = 1.0;
+
+	MatrixXf trans = MatrixXf::Identity(4,4);
+	MatrixXf trans_minus = MatrixXf::Identity(4, 4);
+	MatrixXf rot = MatrixXf::Identity(4, 4);
+
+	double theta = (0/180.0)*M_PI;
+
+	trans.col(3) = uniform.bary_center;
+	trans_minus.col(3) = -uniform.bary_center;
+	rot(0,0)= cos(theta);
+	rot(0, 1) = sin(theta);
+	rot(1, 1) = cos(theta);
+	rot(1, 0) = -sin(theta);
+
+	uniform.bc_rot_tran = trans*rot*trans_minus;
+
 	// pushing triangle information into vertices
 	vector<VertexAttributes> vertices_mesh;
 	// pushing line information into vertices
@@ -200,6 +244,10 @@ int main()
 		uniform.lbn = (uniform.M_cam*lbn_world).head(3);
 		uniform.rtf = (uniform.M_cam*rtf_world).head(3);
 		
+		uniform.lbn(0) -= 0.1;
+		uniform.lbn(1) -= 0.1;
+		uniform.lbn(2) -= 0.1;
+
 		// computing M_orth
 		// not doing (n - f) here since, the bounded box limits are already transformed to the right axis before while
 		// transforming the bounding box from the world frame to the camera frame
@@ -222,19 +270,7 @@ int main()
 	Vector4f camera_location;
 	camera_location << uniform.light_source(0), uniform.light_source(1), uniform.light_source(2), 1;
 	// bringing light source into the view volume frame
-	uniform.light_source = (uniform.M*camera_location).head(3);
-
-	// First triangle
-	vector<VertexAttributes> vertices_1;
-	vertices_1.push_back(VertexAttributes(-1,-1,0));
-	vertices_1.push_back(VertexAttributes(1,-1,0));
-	vertices_1.push_back(VertexAttributes(-1,1,0));
-
-	// Second triangle
-	vector<VertexAttributes> vertices_2;
-	vertices_2.push_back(VertexAttributes(-1,-1,0.5));
-	vertices_2.push_back(VertexAttributes(1,-1,0.5));
-	vertices_2.push_back(VertexAttributes(1,1,0.5));
+	// uniform.light_source = (uniform.M*camera_location).head(3);
 
 	if(uniform.flat_shading || uniform.per_vertex_shading){
 		rasterize_triangles(program, uniform, vertices_mesh, frameBuffer);

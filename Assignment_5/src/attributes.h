@@ -25,11 +25,14 @@ class VertexAttributes
         VertexAttributes r;
         r.position = alpha*a.position + beta*b.position + gamma*c.position;
 		r.normal =  alpha*a.normal + beta*b.normal + gamma*c.normal;
-        return r;
+		r.color = alpha * a.color + beta * b.color + gamma * c.color;
+
+		return r;
     }
 
 	Eigen::Vector4f position;
 	Eigen::Vector3f normal;
+	Eigen::Vector4f color;
 };
 
 class FragmentAttributes
@@ -78,7 +81,8 @@ class UniformAttributes
 		Eigen::Vector4f color;
 		Eigen::Vector3f light_source;
 
-		Eigen::Vector3f diffuse_color, specular_color;
+		Eigen::Vector3f diffuse_color, specular_color, ambient_color;
 		float specular_exponent;
-	
+		Eigen::Vector4f bary_center;
+		Eigen::MatrixXf bc_rot_tran; // bary center rotate translate
 };

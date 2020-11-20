@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/ameduri/Course_work/cg/Assignment_5
+CMAKE_SOURCE_DIR = /home/ameduri/course_work/computer-graphics/Assignment_5
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/ameduri/Course_work/cg/Assignment_5/build_release
+CMAKE_BINARY_DIR = /home/ameduri/course_work/computer-graphics/Assignment_5/build_release
 
 # Include any dependencies generated for this target.
 include CMakeFiles/assignment5.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/assignment5.dir/flags.make
 
 CMakeFiles/assignment5.dir/src/main.cpp.o: CMakeFiles/assignment5.dir/flags.make
 CMakeFiles/assignment5.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ameduri/Course_work/cg/Assignment_5/build_release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/assignment5.dir/src/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/assignment5.dir/src/main.cpp.o -c /home/ameduri/Course_work/cg/Assignment_5/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ameduri/course_work/computer-graphics/Assignment_5/build_release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/assignment5.dir/src/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/assignment5.dir/src/main.cpp.o -c /home/ameduri/course_work/computer-graphics/Assignment_5/src/main.cpp
 
 CMakeFiles/assignment5.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/assignment5.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ameduri/Course_work/cg/Assignment_5/src/main.cpp > CMakeFiles/assignment5.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ameduri/course_work/computer-graphics/Assignment_5/src/main.cpp > CMakeFiles/assignment5.dir/src/main.cpp.i
 
 CMakeFiles/assignment5.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/assignment5.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ameduri/Course_work/cg/Assignment_5/src/main.cpp -o CMakeFiles/assignment5.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ameduri/course_work/computer-graphics/Assignment_5/src/main.cpp -o CMakeFiles/assignment5.dir/src/main.cpp.s
 
 CMakeFiles/assignment5.dir/src/main.cpp.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/assignment5.dir/src/main.cpp.o.provides.build: CMakeFiles/assignment5
 
 CMakeFiles/assignment5.dir/src/raster.cpp.o: CMakeFiles/assignment5.dir/flags.make
 CMakeFiles/assignment5.dir/src/raster.cpp.o: ../src/raster.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ameduri/Course_work/cg/Assignment_5/build_release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/assignment5.dir/src/raster.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/assignment5.dir/src/raster.cpp.o -c /home/ameduri/Course_work/cg/Assignment_5/src/raster.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ameduri/course_work/computer-graphics/Assignment_5/build_release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/assignment5.dir/src/raster.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/assignment5.dir/src/raster.cpp.o -c /home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.cpp
 
 CMakeFiles/assignment5.dir/src/raster.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/assignment5.dir/src/raster.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ameduri/Course_work/cg/Assignment_5/src/raster.cpp > CMakeFiles/assignment5.dir/src/raster.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.cpp > CMakeFiles/assignment5.dir/src/raster.cpp.i
 
 CMakeFiles/assignment5.dir/src/raster.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/assignment5.dir/src/raster.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ameduri/Course_work/cg/Assignment_5/src/raster.cpp -o CMakeFiles/assignment5.dir/src/raster.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.cpp -o CMakeFiles/assignment5.dir/src/raster.cpp.s
 
 CMakeFiles/assignment5.dir/src/raster.cpp.o.requires:
 
@@ -117,7 +117,7 @@ assignment5: CMakeFiles/assignment5.dir/src/main.cpp.o
 assignment5: CMakeFiles/assignment5.dir/src/raster.cpp.o
 assignment5: CMakeFiles/assignment5.dir/build.make
 assignment5: CMakeFiles/assignment5.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ameduri/Course_work/cg/Assignment_5/build_release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable assignment5"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ameduri/course_work/computer-graphics/Assignment_5/build_release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable assignment5"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/assignment5.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -135,6 +135,6 @@ CMakeFiles/assignment5.dir/clean:
 .PHONY : CMakeFiles/assignment5.dir/clean
 
 CMakeFiles/assignment5.dir/depend:
-	cd /home/ameduri/Course_work/cg/Assignment_5/build_release && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/ameduri/Course_work/cg/Assignment_5 /home/ameduri/Course_work/cg/Assignment_5 /home/ameduri/Course_work/cg/Assignment_5/build_release /home/ameduri/Course_work/cg/Assignment_5/build_release /home/ameduri/Course_work/cg/Assignment_5/build_release/CMakeFiles/assignment5.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/ameduri/course_work/computer-graphics/Assignment_5/build_release && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/ameduri/course_work/computer-graphics/Assignment_5 /home/ameduri/course_work/computer-graphics/Assignment_5 /home/ameduri/course_work/computer-graphics/Assignment_5/build_release /home/ameduri/course_work/computer-graphics/Assignment_5/build_release /home/ameduri/course_work/computer-graphics/Assignment_5/build_release/CMakeFiles/assignment5.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/assignment5.dir/depend
 

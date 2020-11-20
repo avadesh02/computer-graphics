@@ -1066,6 +1066,22 @@ lapacke_mangling.h
 
 ../../ext/eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h
 
+../../ext/gif-h/gif.h
+stdio.h
+-
+string.h
+-
+stdint.h
+-
+stdlib.h
+-
+stdlib.h
+-
+stdlib.h
+-
+stdlib.h
+-
+
 ../../ext/stb/stb_image_write.h
 stdio.h
 -
@@ -1099,6 +1115,8 @@ fstream
 -
 raster.h
 /home/ameduri/course_work/computer-graphics/Assignment_5/src/raster.h
+gif.h
+-
 stb_image_write.h
 /home/ameduri/course_work/computer-graphics/Assignment_5/src/stb_image_write.h
 

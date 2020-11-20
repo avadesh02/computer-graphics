@@ -213,6 +213,7 @@ CMakeFiles/assignment5.dir/src/main.cpp.o: ../../ext/eigen/Eigen/src/plugins/Com
 CMakeFiles/assignment5.dir/src/main.cpp.o: ../../ext/eigen/Eigen/src/plugins/CommonCwiseUnaryOps.h
 CMakeFiles/assignment5.dir/src/main.cpp.o: ../../ext/eigen/Eigen/src/plugins/MatrixCwiseBinaryOps.h
 CMakeFiles/assignment5.dir/src/main.cpp.o: ../../ext/eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h
+CMakeFiles/assignment5.dir/src/main.cpp.o: ../../ext/gif-h/gif.h
 CMakeFiles/assignment5.dir/src/main.cpp.o: ../../ext/stb/stb_image_write.h
 CMakeFiles/assignment5.dir/src/main.cpp.o: ../src/attributes.h
 CMakeFiles/assignment5.dir/src/main.cpp.o: ../src/main.cpp

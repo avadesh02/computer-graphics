@@ -76,6 +76,7 @@ class UniformAttributes
 		bool draw_wireframe; // draws wireframe
 		bool flat_shading;
 		bool per_vertex_shading;
+		bool render_gif; // renders gif
 		Eigen::Matrix4f M_orth, M_cam, M_model, M, M_inv, M_orth_inv, M_cam_inv;
 		Eigen::Vector3f lbn, rtf; // lower and upper limit of camera view
 		Eigen::Vector4f color;

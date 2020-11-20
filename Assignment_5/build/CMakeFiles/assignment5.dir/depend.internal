@@ -214,6 +214,7 @@ CMakeFiles/assignment5.dir/src/main.cpp.o
  ../../ext/eigen/Eigen/src/plugins/CommonCwiseUnaryOps.h
  ../../ext/eigen/Eigen/src/plugins/MatrixCwiseBinaryOps.h
  ../../ext/eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h
+ ../../ext/gif-h/gif.h
  ../../ext/stb/stb_image_write.h
  /home/ameduri/course_work/computer-graphics/Assignment_5/src/attributes.h
  /home/ameduri/course_work/computer-graphics/Assignment_5/src/main.cpp

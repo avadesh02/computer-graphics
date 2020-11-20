@@ -112,8 +112,8 @@ int main()
 	uniform.camera.view_up << 0,1,0;
 	uniform.camera.is_perspective = false;
 	uniform.draw_wireframe = false;
-	uniform.flat_shading = true;
-	uniform.per_vertex_shading = false;
+	uniform.flat_shading = false;
+	uniform.per_vertex_shading = true;
 
 	uniform.color << 1,0,0,1;
 	uniform.light_source << 0,2,2;
@@ -122,7 +122,7 @@ int main()
 	uniform.specular_exponent = 265.0;
 	uniform.ambient_color << 0.2, 0.2, 0.2;
 
-	uniform.render_gif = false;
+	uniform.render_gif = true;
 
 	// loading the mesh
 	MatrixXd V;
@@ -134,10 +134,10 @@ int main()
 	double area = 0, triangle_area;
 	uniform.bary_center.setZero();
 
-	V_p.resize(V.rows(), V.cols());
-	V_p.setZero();
 	load_off(filename, V, F);
 
+	V_p.resize(V.rows(), V.cols());
+	V_p.setZero();
 	for (unsigned i = 0; i < F.rows(); i++){
 		Vector3f u, v;
 		// computing bary center of object
@@ -150,10 +150,11 @@ int main()
 
 		if (uniform.per_vertex_shading)
 		// computing average normal at each vertex for per vertex shading
+		// normalising of the entire normal is done at line 194
 		{
-			V_p.row(F(i, 0)) = (-u.cross(v)).normalized();
-			V_p.row(F(i, 1)) = (-u.cross(v)).normalized();
-			V_p.row(F(i, 2)) = (-u.cross(v)).normalized();
+			V_p.row(F(i, 0)) += (-u.cross(v)).normalized();
+			V_p.row(F(i, 1)) += (-u.cross(v)).normalized();
+			V_p.row(F(i, 2)) += (-u.cross(v)).normalized();
 		}
 	}
 
@@ -190,11 +191,10 @@ int main()
 			vertices_mesh[3*i+2].normal = (-u.cross(v)).normalized(); 
 		}
 		if (uniform.per_vertex_shading){
-			
+			// normalizing the normals at each vertex 
 			vertices_mesh[3*i].normal = V_p.row(F(i,0)).normalized(); 
 			vertices_mesh[3*i+1].normal = V_p.row(F(i,1)).normalized();
 			vertices_mesh[3 * i + 2].normal = V_p.row(F(i, 2)).normalized();
-			// not normalising the average since this is done in the vertex shader
 		}
 	}
 

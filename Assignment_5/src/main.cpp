@@ -47,29 +47,34 @@ int main()
 
 	// The vertex shader is the identity
 	program.VertexShader = [](const VertexAttributes &va, const UniformAttributes &uniform) {
-		Vector3f Li = (uniform.light_source - va.position.head(3)).normalized();
-		Vector3f bisector = ((uniform.light_source - va.position.head(3)) - ((uniform.camera.position).cast<float> () - va.position.head(3))).normalized();
+		Vector4f transformed_normal, transformed_vector;
+
+		for (unsigned i = 0; i < 3; i++)
+		{
+			transformed_vector[i] = va.position[i];
+			transformed_normal[i] = va.normal[i];
+		}
+		transformed_vector[3] = 1;
+		transformed_normal[3] = 1;
+		transformed_vector = uniform.bc_rot_tran * transformed_vector;
+		transformed_normal = uniform.bc_rot_tran.inverse() * transformed_normal;
+
+		Vector3f Li = (uniform.light_source - transformed_vector.head(3)).normalized();
+		Vector3f bisector = ((uniform.light_source - transformed_vector.head(3)) - ((uniform.camera.position).cast<float> () - transformed_vector.head(3))).normalized();
 		Vector3f diffuse, specular, color;
-		diffuse = uniform.diffuse_color * std::max(Li.dot(va.normal), float(0.0));
+		diffuse = uniform.diffuse_color * std::max(Li.dot(transformed_normal.head(3)), float(0.0));
 		// implement specular
-		specular = uniform.specular_color * pow(std::max(va.normal.dot(bisector), float(0.0)), uniform.specular_exponent);
+		specular = uniform.specular_color * pow(std::max(transformed_normal.head(3).dot(bisector), float(0.0)), uniform.specular_exponent);
 
 		color = uniform.ambient_color + diffuse + specular;
 
 		// rotating the object and translating around the barycenter
-		Vector4f transformed_vector;
-
-		for(unsigned i = 0; i < 3; i ++)
-		{
-			transformed_vector[i] = va.position[i];
-		}
-		transformed_vector[3] = 1;
-		transformed_vector = uniform.bc_rot_tran*transformed_vector;
+		
 		transformed_vector = uniform.M*transformed_vector;
 		// transforming normal at the vertex into the canonical view volume space
 		//replacing 4th co-ordinate with alpha
 		VertexAttributes out(transformed_vector[0],transformed_vector[1],transformed_vector[2], va.position[3]);
-		out.normal = va.normal;
+		out.normal = transformed_normal.head(3);
 		out.color.head(3) = color;
 		out.color[3] = uniform.color(3);
 		return out;
@@ -117,7 +122,7 @@ int main()
 	uniform.specular_exponent = 265.0;
 	uniform.ambient_color << 0.2, 0.2, 0.2;
 
-	uniform.render_gif = true;
+	uniform.render_gif = false;
 
 	// loading the mesh
 	MatrixXd V;
@@ -132,7 +137,7 @@ int main()
 	V_p.resize(V.rows(), V.cols());
 	V_p.setZero();
 	load_off(filename, V, F);
-	
+
 	for (unsigned i = 0; i < F.rows(); i++){
 		Vector3f u, v;
 		// computing bary center of object
@@ -192,7 +197,7 @@ int main()
 			// not normalising the average since this is done in the vertex shader
 		}
 	}
-	
+
 	// computing the transformation matrices
 	// computing transformation from wold to camera
 	Vector3d w, u, v;
@@ -209,33 +214,33 @@ int main()
 	uniform.M_cam = tmp.inverse();
 
 	// compututing transformation from camera view to cannoincal view volume
-	if (!uniform.camera.is_perspective){
-		Vector4f lbn_world, rtf_world;
-		for (unsigned i = 0; i < V.cols() ; i ++){
-			lbn_world[i] = V.col(i).minCoeff();
-			rtf_world[i] = V.col(i).maxCoeff();
-			
-		}
-		lbn_world[3] = 1; rtf_world[3] = 1;
-		// tranforming from world to camera frame
-		uniform.lbn = (uniform.M_cam*lbn_world).head(3);
-		uniform.rtf = (uniform.M_cam*rtf_world).head(3);
+	Vector4f lbn_world, rtf_world;
+	for (unsigned i = 0; i < V.cols() ; i ++){
+		lbn_world[i] = V.col(i).minCoeff();
+		rtf_world[i] = V.col(i).maxCoeff();
 		
-		uniform.lbn(0) -= 0.1;
-		uniform.lbn(1) -= 0.1;
-		uniform.lbn(2) -= 0.1;
-
-		// computing M_orth
-		// not doing (n - f) here since, the bounded box limits are already transformed to the right axis before while
-		// transforming the bounding box from the world frame to the camera frame
-		uniform.M_orth << 2/(uniform.rtf(0) - uniform.lbn(0)), 0, 0, -(uniform.rtf(0) + uniform.lbn(0))/(uniform.rtf(0) - uniform.lbn(0)),
-					0, 2/(uniform.rtf(1) - uniform.lbn(1)), 0, -(uniform.rtf(1) + uniform.lbn(1))/(uniform.rtf(1) - uniform.lbn(1)),
-					0, 0, -2/(uniform.lbn(2) - uniform.rtf(2)), (uniform.rtf(2) + uniform.lbn(2))/(uniform.lbn(2) - uniform.rtf(2)),
-					0, 0, 0, 1;
 	}
-	else{
+	lbn_world[3] = 1; rtf_world[3] = 1;
+	// tranforming from world to camera frame
+	uniform.lbn = (uniform.M_cam*lbn_world).head(3);
+	uniform.rtf = (uniform.M_cam*rtf_world).head(3);
+	
+	uniform.lbn(0) -= 0.1;
+	uniform.lbn(1) -= 0.1;
+	uniform.lbn(2) -= 0.1;
+
+	// computing M_orth
+	// not doing (n - f) here since, the bounded box limits are already transformed to the right axis before while
+	// transforming the bounding box from the world frame to the camera frame
+	if (uniform.camera.is_perspective)
+	{
 		// to do for perspective
 	}
+
+	uniform.M_orth << 2/(uniform.rtf(0) - uniform.lbn(0)), 0, 0, -(uniform.rtf(0) + uniform.lbn(0))/(uniform.rtf(0) - uniform.lbn(0)),
+				0, 2/(uniform.rtf(1) - uniform.lbn(1)), 0, -(uniform.rtf(1) + uniform.lbn(1))/(uniform.rtf(1) - uniform.lbn(1)),
+				0, 0, -2/(uniform.lbn(2) - uniform.rtf(2)), (uniform.rtf(2) + uniform.lbn(2))/(uniform.lbn(2) - uniform.rtf(2)),
+				0, 0, 0, 1;
 	
 	// M_vp is not computed as it is carried out in the rasterize triangle part
 	// M_object to world is assumed to be identity 
@@ -274,8 +279,8 @@ int main()
 
 			uniform.bc_rot_tran = trans * rot * trans_minus;
 			// translates object after rotation
-			translate[0] += -0.005;
-			translate[1] += -0.005;
+			translate[0] += -0.01;
+			translate[1] += -0.01;
 
 			trans.col(3).head(3) = translate;
 			uniform.bc_rot_tran = trans * uniform.bc_rot_tran;
@@ -298,7 +303,9 @@ int main()
 		return 0;
 	}
 	else{
-		if (uniform.flat_shading || uniform.per_vertex_shading){
+		uniform.bc_rot_tran = MatrixXf::Identity(4, 4);
+		if (uniform.flat_shading || uniform.per_vertex_shading)
+		{
 			rasterize_triangles(program, uniform, vertices_mesh, frameBuffer);
 		}
 		if (uniform.draw_wireframe){

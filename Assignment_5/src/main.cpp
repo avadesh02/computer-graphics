@@ -110,10 +110,11 @@ int main()
 	uniform.camera.position << 0,0,-2;
 	uniform.camera.gaze_direction << 0,0,-1;
 	uniform.camera.view_up << 0,1,0;
+	uniform.camera.field_of_view = (10.0/180.0)*M_PI;
 	uniform.camera.is_perspective = false;
 	uniform.draw_wireframe = false;
-	uniform.flat_shading = false;
-	uniform.per_vertex_shading = true;
+	uniform.flat_shading = true;
+	uniform.per_vertex_shading = false;
 
 	uniform.color << 1,0,0,1;
 	uniform.light_source << 0,2,2;
@@ -122,7 +123,7 @@ int main()
 	uniform.specular_exponent = 265.0;
 	uniform.ambient_color << 0.2, 0.2, 0.2;
 
-	uniform.render_gif = true;
+	uniform.render_gif = false;
 
 	// loading the mesh
 	MatrixXd V;
@@ -235,13 +236,23 @@ int main()
 	if (uniform.camera.is_perspective)
 	{
 		// to do for perspective
+		uniform.rtf(1) = std::abs(uniform.lbn(0))*tan(uniform.camera.field_of_view/2);
+		uniform.rtf(0) = (1.0*frameBuffer.cols()/frameBuffer.rows())*uniform.rtf(1);
+		uniform.rtf(2) =uniform.lbn(0) * uniform.rtf(1) / uniform.lbn(1);
+		uniform.P << uniform.lbn(2), 0, 0, 0,
+			0, uniform.lbn(2), 0, 0,
+			0, 0, uniform.lbn(2) + uniform.rtf(2), -uniform.lbn(2) * uniform.rtf(2), 
+			0, 0, 1, 0;
 	}
-
 	uniform.M_orth << 2/(uniform.rtf(0) - uniform.lbn(0)), 0, 0, -(uniform.rtf(0) + uniform.lbn(0))/(uniform.rtf(0) - uniform.lbn(0)),
 				0, 2/(uniform.rtf(1) - uniform.lbn(1)), 0, -(uniform.rtf(1) + uniform.lbn(1))/(uniform.rtf(1) - uniform.lbn(1)),
 				0, 0, -2/(uniform.lbn(2) - uniform.rtf(2)), (uniform.rtf(2) + uniform.lbn(2))/(uniform.lbn(2) - uniform.rtf(2)),
 				0, 0, 0, 1;
 	
+	if (uniform.camera.is_perspective){
+		uniform.M_orth = uniform.P*uniform.M_orth;
+	}
+
 	// M_vp is not computed as it is carried out in the rasterize triangle part
 	// M_object to world is assumed to be identity 
 	uniform.M = uniform.M_orth*uniform.M_cam;

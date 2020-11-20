@@ -81,6 +81,7 @@ class UniformAttributes
 		Eigen::Vector3f lbn, rtf; // lower and upper limit of camera view
 		Eigen::Vector4f color;
 		Eigen::Vector3f light_source;
+		Eigen::Matrix4f P;
 
 		Eigen::Vector3f diffuse_color, specular_color, ambient_color;
 		float specular_exponent;

@@ -88,4 +88,5 @@ class UniformAttributes
 		float specular_exponent;
 		Eigen::Vector4f bary_center;
 		Eigen::MatrixXf bc_rot_tran; // bary center rotate translate
+		Eigen::Matrix4f view;
 };

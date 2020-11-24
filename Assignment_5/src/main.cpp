@@ -56,7 +56,7 @@ int main()
 		}
 		transformed_vector[3] = 1;
 		transformed_normal[3] = 1;
-		transformed_vector = uniform.bc_rot_tran * transformed_vector;
+		transformed_vector = uniform.view*uniform.bc_rot_tran * transformed_vector;
 
 		transformed_normal = (uniform.bc_rot_tran.inverse()).transpose()* transformed_normal;
 
@@ -108,14 +108,14 @@ int main()
 
 	// initialising camera attributes before rendering mesh
 	// TODO: check the frame buffer initialization  
-	uniform.camera.position << 0,0,-2;
+	uniform.camera.position << 0.25,0.0,-3;
 	uniform.camera.gaze_direction << 0,0,1;
 	uniform.camera.view_up << 0,1,0;
-	uniform.camera.field_of_view = (40.0/180.0)*M_PI;
-	uniform.camera.is_perspective = false;
+	uniform.camera.field_of_view = (50.0/180.0)*M_PI;
+	uniform.camera.is_perspective = true;
 	uniform.draw_wireframe = false;
-	uniform.flat_shading = false;
-	uniform.per_vertex_shading = true;
+	uniform.flat_shading = true;
+	uniform.per_vertex_shading = false;
 
 	uniform.color << 1,0,0,1;
 	uniform.light_source << 0,0,-2;
@@ -124,7 +124,7 @@ int main()
 	uniform.specular_exponent = 265.0;
 	uniform.ambient_color << 0.2, 0.2, 0.2;
 
-	uniform.render_gif = true;
+	uniform.render_gif = false;
 
 	// loading the mesh
 	MatrixXd V;
@@ -258,7 +258,7 @@ int main()
 				0, 0, 0, 1;
 	
 	if (uniform.camera.is_perspective){
-		uniform.M_orth = uniform.P*uniform.M_orth;
+		uniform.M_orth = uniform.M_orth*uniform.P;
 	}
 
 	// M_vp is not computed as it is carried out in the rasterize triangle part
@@ -267,6 +267,21 @@ int main()
 	// storing the inverse to tranform normals computed at each vertex into the canonical view volume space
 	Vector4f camera_location;
 	camera_location << uniform.light_source(0), uniform.light_source(1), uniform.light_source(2), 1;
+
+
+	// Add a transformation to compensate for the aspect ratio of the framebuffer
+	float aspect_ratio = float(frameBuffer.cols())/float(frameBuffer.rows());
+
+	uniform.view <<
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1;
+
+	if (aspect_ratio < 1)
+		uniform.view(0,0) = aspect_ratio;
+	else
+		uniform.view(1,1) = 1/aspect_ratio;
 
 
 	if (uniform.render_gif){

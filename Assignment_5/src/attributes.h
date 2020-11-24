@@ -23,7 +23,8 @@ class VertexAttributes
     ) 
     {
         VertexAttributes r;
-        r.position = alpha*a.position + beta*b.position + gamma*c.position;
+        r.position = alpha*a.position/a.position[3] + beta*b.position/b.position[3] + gamma*c.position/c.position[3];
+		// not modifing the normal since it is used to compute lighting in the world frame
 		r.normal =  alpha*a.normal + beta*b.normal + gamma*c.normal;
 		r.color = alpha * a.color + beta * b.color + gamma * c.color;
 
@@ -56,7 +57,7 @@ class FrameBufferAttributes
 	}
 
 	Eigen::Matrix<uint8_t,4,1> color;
-	float depth = -1000;
+	float depth = 2;
 };
 
 class UniformAttributes

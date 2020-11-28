@@ -12,6 +12,7 @@ using json = nlohmann::json;
 #include <Eigen/Core>
 #include "raster.h"
 #include "object.h"
+#include "integrator.h"
 
 using namespace std;
 using namespace Eigen;
@@ -28,4 +29,6 @@ void compute_normals(vector<Object>& objects, UniformAttributes & uniform);
 void compute_transformation_matrices(vector<Object> &objects, double frameBuffer_cols, double frameBuffer_rows, 
 										UniformAttributes& uniform);
 
-void load_scene(const std::string &filename, UniformAttributes& uniform, vector<Object> &objects);
+void load_scene(const std::string &filename, UniformAttributes& uniform, vector<Object> &objects, Integrator &integrator);
+
+

@@ -4,6 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/ameduri/course_work/computer-graphics/simulator/src/integrator.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/integrator.cpp.o"
   "/home/ameduri/course_work/computer-graphics/simulator/src/main.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/main.cpp.o"
   "/home/ameduri/course_work/computer-graphics/simulator/src/mesh_loader.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/mesh_loader.cpp.o"
   "/home/ameduri/course_work/computer-graphics/simulator/src/object.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/object.cpp.o"

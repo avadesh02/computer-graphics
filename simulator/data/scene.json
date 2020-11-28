@@ -1,7 +1,7 @@
 {
 	"camera":
 	{
-		"position": [0.25,0.0,-3],
+		"position": [0.0,0.0,-3],
 		"gaze_direction": [0,0,1],
 		"view_up": [0,1,0],
 		"field_view": 10,
@@ -12,22 +12,38 @@
 	},
 	"lights": 
 	{
-		"source": [0.0,0.0,-2.0],
+		"source": [0.0, 0.0, 2],
 		"ambient": [0.2, 0.2, 0.2],
 		"diffuse": [0.4, 0.4, 0.4],
 		"specular": [0.2, 0.2, 0.2],
 		"exp": 256.0
 	},
-	"render_gif" : false,
+	"render_gif" : true,
+	"integrator":
+	{
+		"T": 1500,
+		"dt": 0.001,
+		"kp": [5000, 5000, 5000],
+		"kd": [100, 100, 100],
+		"g": [0,-9.81,0]
+	},
 	"objects": [
 		{
 			"path": "sphere.off",
 			"type": "sphere",
+			"mass": 5.0,
+			"fixed": false
+		},
+		{
+			"path": "sphere.off",
+			"type": "sphere",
+			"mass": 3.0,
 			"fixed": false
 		},
 		{
 			"path": "box.off",
 			"type": "box",
+			"mass": 1.0,
 			"fixed": true
 		}
 	]

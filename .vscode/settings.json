@@ -95,6 +95,7 @@
         "vec4us": "cpp",
         "mixinvector": "cpp",
         "buffered_value": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "geometry": "cpp"
     }
 }

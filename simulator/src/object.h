@@ -8,6 +8,9 @@
 #include <Eigen/Core>
 #include "attributes.h"
 
+#ifndef OBJECT_H
+#define OBJECT_H
+
 using namespace std;
 using namespace Eigen;
 
@@ -22,12 +25,15 @@ struct Object{
     bool is_fixed;
     bool is_sphere;
     Vector4f center_loc; // center of box
-    Vector4f displacement; // the amount the object has moved from its initial location
-
+    Vector3f displacement; // the amount the object has moved from its initial location
+    Vector3f velocity;
     AlignedBox3f box; // used to compute collision and location
+
+    double mass;
 
     void resize_object(float sx, float sy, float sz);
     void translate_object(float px, float py, float pz);
     void locate_center();
 };
 
+#endif

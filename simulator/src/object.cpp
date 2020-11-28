@@ -32,4 +32,6 @@ void Object::translate_object(float px, float py, float pz){
 void Object::locate_center(){
     center_loc.head(3) = (box.max() + box.min())/2.0;
     center_loc[3] = 1;
+    displacement << 0,0,0;
+
 };

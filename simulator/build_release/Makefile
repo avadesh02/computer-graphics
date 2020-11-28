@@ -123,6 +123,33 @@ simulator/fast:
 	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/build
 .PHONY : simulator/fast
 
+src/integrator.o: src/integrator.cpp.o
+
+.PHONY : src/integrator.o
+
+# target to build an object file
+src/integrator.cpp.o:
+	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/src/integrator.cpp.o
+.PHONY : src/integrator.cpp.o
+
+src/integrator.i: src/integrator.cpp.i
+
+.PHONY : src/integrator.i
+
+# target to preprocess a source file
+src/integrator.cpp.i:
+	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/src/integrator.cpp.i
+.PHONY : src/integrator.cpp.i
+
+src/integrator.s: src/integrator.cpp.s
+
+.PHONY : src/integrator.s
+
+# target to generate assembly for a file
+src/integrator.cpp.s:
+	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/src/integrator.cpp.s
+.PHONY : src/integrator.cpp.s
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -240,6 +267,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... simulator"
 	@echo "... edit_cache"
+	@echo "... src/integrator.o"
+	@echo "... src/integrator.i"
+	@echo "... src/integrator.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

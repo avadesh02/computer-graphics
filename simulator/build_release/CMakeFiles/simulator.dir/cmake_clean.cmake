@@ -3,6 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/simulator.dir/src/raster.cpp.o"
   "CMakeFiles/simulator.dir/src/object.cpp.o"
   "CMakeFiles/simulator.dir/src/mesh_loader.cpp.o"
+  "CMakeFiles/simulator.dir/src/integrator.cpp.o"
   "simulator.pdb"
   "simulator"
 )

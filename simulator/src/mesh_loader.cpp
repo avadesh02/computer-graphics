@@ -19,7 +19,7 @@ void load_off(const std::string &filename, MatrixXd &V, MatrixXi &F) {
 	}
 }
 
-void load_scene(const std::string &filename, UniformAttributes& uniform, vector<Object> &objects){
+void load_scene(const std::string &filename, UniformAttributes& uniform, vector<Object> &objects, Integrator &integrator){
 	json data;
 	std::ifstream in(filename);
 	in >> data;
@@ -51,10 +51,19 @@ void load_scene(const std::string &filename, UniformAttributes& uniform, vector<
 	uniform.ambient_color = read_vec3f(data["lights"]["ambient"]);
 
 	uniform.render_gif = data["render_gif"];
+
+	integrator.T = data["integrator"]["T"]; //duration of simulation
+	integrator.dt = data["integrator"]["dt"];
+	integrator.kp = read_vec3f(data["integrator"]["kp"]);
+	integrator.kd = read_vec3f(data["integrator"]["kd"]);
+	integrator.g = read_vec3f(data["integrator"]["g"]);
+
 	for (const auto &entry : data["objects"]){
 		Object object;
 		std::string filename = std::string("../data/") + entry["path"].get<std::string>();
 		load_off(filename, object.V, object.F);
+		object.mass = entry["mass"];
+		object.velocity << 0, 0, 0;
 		if (entry["type"] == "sphere"){
 			object.is_sphere = true; // stores if the object is a sphere or a cube
 		}

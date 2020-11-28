@@ -10,6 +10,8 @@ add_executable("simulator"
 	src/object.h
 	src/object.cpp
 	src/mesh_loader.cpp
+	src/integrator.h
+	src/integrator.cpp
 )
 
 # Include Eigen for linear algebra, stb and gif-h to export images, json to parse the json files

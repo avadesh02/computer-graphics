@@ -7,6 +7,8 @@ add_executable("simulator"
 	src/raster.h
 	src/raster.cpp
 	src/mesh_loader.h
+	src/object.h
+	src/object.cpp
 	src/mesh_loader.cpp
 )
 

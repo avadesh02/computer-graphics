@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/ameduri/course_work/computer-graphics/simulator/src/main.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/main.cpp.o"
   "/home/ameduri/course_work/computer-graphics/simulator/src/mesh_loader.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/mesh_loader.cpp.o"
+  "/home/ameduri/course_work/computer-graphics/simulator/src/object.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/object.cpp.o"
   "/home/ameduri/course_work/computer-graphics/simulator/src/raster.cpp" "/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles/simulator.dir/src/raster.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

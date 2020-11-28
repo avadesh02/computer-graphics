@@ -93,14 +93,19 @@ int main()
 
 	// initialising camera attributes before rendering mesh
 	std::string file_name = "../data/scene.json" ;
-	vector<MatrixXd> V_arr;
-	vector<MatrixXi> F_arr;
-	vector<MatrixXf> V_p_arr;
-	vector<vector<VertexAttributes>> vertices_mesh_arr;
-	vector<vector<VertexAttributes>> vertices_lines_arr;
+	vector<Object> objects;
 
-	load_scene(file_name, uniform, V_arr, F_arr, V_p_arr, vertices_mesh_arr, vertices_lines_arr, 
-				frameBuffer.cols(), frameBuffer.rows());
+	
+	load_scene(file_name, uniform, objects);
+	compute_normals(objects, uniform);
+	compute_transformation_matrices(objects,frameBuffer.cols(),frameBuffer.rows(), uniform);
+
+	objects[0].resize_object(0.2, 0.2, 0.2);
+	objects[0].translate_object(0.0, 0.6, 0);
+
+	objects[1].resize_object(2.0, 0.1, 1.0);
+	objects[1].translate_object(0.0, -0.3, 0);
+	
 
 	if (uniform.render_gif){
 		MatrixXf trans = MatrixXf::Identity(4, 4);
@@ -132,14 +137,14 @@ int main()
 			uniform.bc_rot_tran = trans * uniform.bc_rot_tran;
 
 			frameBuffer.setConstant(FrameBufferAttributes());
-			for (unsigned i = 0; i < vertices_mesh_arr.size(); i++){
+			for (unsigned i = 0; i < objects.size(); i++){
 				if (uniform.flat_shading || uniform.per_vertex_shading)
 				{
-					rasterize_triangles(program, uniform, vertices_mesh_arr[i], frameBuffer);
+					rasterize_triangles(program, uniform, objects[i].vertices_mesh, frameBuffer);
 				}
 				if (uniform.draw_wireframe)
 				{
-					rasterize_lines(program, uniform, vertices_lines_arr[i], 1.0, frameBuffer);
+					rasterize_lines(program, uniform, objects[i].vertices_lines, 1.0, frameBuffer);
 				}
 
 			}
@@ -153,20 +158,22 @@ int main()
 	}
 	else{
 		uniform.bc_rot_tran = MatrixXf::Identity(4, 4);
-		for (unsigned i = 0; i < vertices_mesh_arr.size(); i++){
+		// uniform.bc_rot_tran(1,1)= 0.2;
+		// uniform.bc_rot_tran(3,3) = 1;
+		for (unsigned i = 0; i < objects.size(); i++){
 			if (uniform.flat_shading || uniform.per_vertex_shading)
 			{
-				rasterize_triangles(program, uniform, vertices_mesh_arr[i], frameBuffer);
+				rasterize_triangles(program, uniform, objects[i].vertices_mesh, frameBuffer);
 			}
 			if (uniform.draw_wireframe)
 			{
-				rasterize_lines(program, uniform, vertices_lines_arr[i], 1.0, frameBuffer);
+				rasterize_lines(program, uniform, objects[i].vertices_lines, 1.0, frameBuffer);
 			}
 
 		}
 			
+			
 	}
-	
 	
 	vector<uint8_t> image;
 	framebuffer_to_uint8(frameBuffer,image);

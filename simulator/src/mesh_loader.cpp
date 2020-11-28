@@ -19,11 +19,7 @@ void load_off(const std::string &filename, MatrixXd &V, MatrixXi &F) {
 	}
 }
 
-void load_scene(const std::string &filename, UniformAttributes& uniform, vector<MatrixXd> &V_arr, 
-					vector<MatrixXi> &F_arr, vector<MatrixXf> &V_p_arr, 
-					vector<vector<VertexAttributes>> &vertices_mesh_arr,
-					vector<vector<VertexAttributes>> &vertices_lines_arr,
-					double frameBuffer_cols, double frameBuffer_rows){
+void load_scene(const std::string &filename, UniformAttributes& uniform, vector<Object> &objects){
 	json data;
 	std::ifstream in(filename);
 	in >> data;
@@ -56,38 +52,40 @@ void load_scene(const std::string &filename, UniformAttributes& uniform, vector<
 
 	uniform.render_gif = data["render_gif"];
 	for (const auto &entry : data["objects"]){
-		MatrixXd V; MatrixXi F; MatrixXf V_p;
-		vector<VertexAttributes> vertices_mesh; vector<VertexAttributes> vertices_lines;
-		
+		Object object;
 		std::string filename = std::string("../data/") + entry["path"].get<std::string>();
-		load_off(filename, V, F);
-		compute_normals(V, F, V_p, vertices_mesh, vertices_lines, uniform);
-	
-		V_arr.push_back(V); F_arr.push_back(F); V_p_arr.push_back(V_p);
-		vertices_mesh_arr.push_back(vertices_mesh); vertices_lines_arr.push_back(vertices_lines);
+		load_off(filename, object.V, object.F);
+		if (entry["type"] == "sphere"){
+			object.is_sphere = true; // stores if the object is a sphere or a cube
+		}
+		else{
+			object.is_sphere = false;
+		}
+		if (entry["fixed"]){
+			object.is_fixed = true; // stores if the object can move in space (only considering free objects)
+		}
+		else{
+			object.is_fixed = false;
+		}
+		objects.push_back(object);
 	}
-	compute_transformation_matrices(V_arr,frameBuffer_cols,frameBuffer_rows, uniform);
-
 };
 
-
-void compute_normals(MatrixXd &V, MatrixXi &F, MatrixXf &V_p, 
-					std::vector<VertexAttributes> &vertices_mesh, 
-					std::vector<VertexAttributes> &vertices_lines, 
-					UniformAttributes & uniform){
+void compute_normal(Object& object, UniformAttributes & uniform){
 
     Vector3f traingle_center;
-    V_p.resize(V.rows(), V.cols());
-	V_p.setZero();
+    object.V_p.resize(object.V.rows(), object.V.cols());
+	object.V_p.setZero();
 	double area = 0, triangle_area;
     uniform.bary_center.setZero();
-	for (unsigned i = 0; i < F.rows(); i++){
+	for (unsigned i = 0; i < object.F.rows(); i++){
 		Vector3f u, v;
 		// computing bary center of object
-		u = V.row((F(i, 0))).cast <float> () - V.row(F(i, 1)).cast <float> ();
-		v = V.row((F(i, 2))).cast <float> () - V.row(F(i, 1)).cast <float> ();
+		u = object.V.row((object.F(i, 0))).cast <float> () - object.V.row(object.F(i, 1)).cast <float> ();
+		v = object.V.row((object.F(i, 2))).cast <float> () - object.V.row(object.F(i, 1)).cast <float> ();
 		triangle_area = 0.5*(u.cross(v).norm());
-		traingle_center = (1/3.0)*(V.row((F(i, 0))).cast<float>() + V.row(F(i, 1)).cast<float>() + V.row(F(i, 1)).cast<float>());
+		traingle_center = (1/3.0)*(object.V.row((object.F(i, 0))).cast<float>() 
+			+ object.V.row(object.F(i, 1)).cast<float>() + object.V.row(object.F(i, 1)).cast<float>());
 		uniform.bary_center.head(3) += traingle_center*triangle_area;
 		area += triangle_area;
 
@@ -95,50 +93,62 @@ void compute_normals(MatrixXd &V, MatrixXi &F, MatrixXf &V_p,
 		// computing average normal at each vertex for per vertex shading
 		// normalising of the entire normal is done at line 194
 		{
-			V_p.row(F(i, 0)) += (u.cross(v)).normalized();
-			V_p.row(F(i, 1)) += (u.cross(v)).normalized();
-			V_p.row(F(i, 2)) += (u.cross(v)).normalized();
+			object.V_p.row(object.F(i, 0)) += (u.cross(v)).normalized();
+			object.V_p.row(object.F(i, 1)) += (u.cross(v)).normalized();
+			object.V_p.row(object.F(i, 2)) += (u.cross(v)).normalized();
 		}
 	}
 
 	uniform.bary_center.head(3) = uniform.bary_center.head(3)/area;
 	uniform.bary_center[3] = 1.0;
 
-    for (unsigned i = 0; i < F.rows(); i++){
-		for (unsigned j = 0; j < F.cols(); j ++){
-			vertices_mesh.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
+    for (unsigned i = 0; i < object.F.rows(); i++){
+		for (unsigned j = 0; j < object.F.cols(); j ++){
+			object.vertices_mesh.push_back(VertexAttributes(object.V(object.F(i,j),0)
+			,object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
 			if(uniform.draw_wireframe){
 				if (j == 0){
-					vertices_lines.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
+					object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,j),0)
+					,object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
 				}
 				else{
-					vertices_lines.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
-					vertices_lines.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
+					object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,j),0),
+									object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
+					object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,j),0)
+								,object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
 				}
 			}
 		}
 		if (uniform.draw_wireframe){
-			vertices_lines.push_back(VertexAttributes(V(F(i,0),0),V(F(i,0),1),V(F(i,0),2)));
+			object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,0),0),
+				object.V(object.F(i,0),1),object.V(object.F(i,0),2)));
 		}
 		if (uniform.flat_shading){
 			// computing the face normals
 			Vector3f u,v;
-			u = vertices_mesh[3*i].position.head(3) - vertices_mesh[3*i + 1].position.head(3); 
-			v = vertices_mesh[3*i + 2].position.head(3) - vertices_mesh[3*i + 1].position.head(3);
-			vertices_mesh[3*i].normal = (u.cross(v)).normalized(); 
-			vertices_mesh[3*i+1].normal = (u.cross(v)).normalized(); 
-			vertices_mesh[3*i+2].normal = (u.cross(v)).normalized(); 
+			u = object.vertices_mesh[3*i].position.head(3) - object.vertices_mesh[3*i + 1].position.head(3); 
+			v = object.vertices_mesh[3*i + 2].position.head(3) - object.vertices_mesh[3*i + 1].position.head(3);
+			object.vertices_mesh[3*i].normal = (u.cross(v)).normalized(); 
+			object.vertices_mesh[3*i+1].normal = (u.cross(v)).normalized(); 
+			object.vertices_mesh[3*i+2].normal = (u.cross(v)).normalized(); 
 		}
 		if (uniform.per_vertex_shading){
 			// normalizing the normals at each vertex 
-			vertices_mesh[3*i].normal = V_p.row(F(i,0)).normalized(); 
-			vertices_mesh[3*i+1].normal = V_p.row(F(i,1)).normalized();
-			vertices_mesh[3 * i + 2].normal = V_p.row(F(i, 2)).normalized();
+			object.vertices_mesh[3*i].normal = object.V_p.row(object.F(i,0)).normalized(); 
+			object.vertices_mesh[3*i+1].normal = object.V_p.row(object.F(i,1)).normalized();
+			object.vertices_mesh[3 * i + 2].normal = object.V_p.row(object.F(i, 2)).normalized();
 		}
 	}
 };
 
-void compute_transformation_matrices(vector<MatrixXd> &V_arr, double frameBuffer_cols, double frameBuffer_rows, 
+void compute_normals(vector<Object>& objects, 
+                    UniformAttributes & uniform){
+	for (unsigned i=0; i < objects.size(); i ++){
+		compute_normal(objects[i], uniform);
+	};
+}
+
+void compute_transformation_matrices(vector<Object> &objects, double frameBuffer_cols, double frameBuffer_rows, 
 										UniformAttributes& uniform){
     // computing the transformation matrices
 	// computing transformation from wold to camera
@@ -159,10 +169,10 @@ void compute_transformation_matrices(vector<MatrixXd> &V_arr, double frameBuffer
 	Vector4f lbn_world, rtf_world;
 	lbn_world << 10000, 10000, 10000, 1;
 	rtf_world << -10000, -10000, -10000, 1;
-	for (unsigned j = 0; j < V_arr.size(); j ++){
-		for (unsigned i = 0; i < V_arr[j].cols() ; i ++){
-			lbn_world[i] = std::min(double (lbn_world[i]), V_arr[j].col(i).minCoeff());
-			rtf_world[i] = std::max(double (rtf_world[i]), V_arr[j].col(i).maxCoeff());	
+	for (unsigned j = 0; j < objects.size(); j ++){
+		for (unsigned i = 0; i < objects[j].V.cols() ; i ++){
+			lbn_world[i] = std::min(double (lbn_world[i]), objects[j].V.col(i).minCoeff());
+			rtf_world[i] = std::max(double (rtf_world[i]), objects[j].V.col(i).maxCoeff());	
 		}
 	}
 	//  making the box slightly bigger than the bounding box so that 

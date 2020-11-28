@@ -177,6 +177,33 @@ src/mesh_loader.cpp.s:
 	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/src/mesh_loader.cpp.s
 .PHONY : src/mesh_loader.cpp.s
 
+src/object.o: src/object.cpp.o
+
+.PHONY : src/object.o
+
+# target to build an object file
+src/object.cpp.o:
+	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/src/object.cpp.o
+.PHONY : src/object.cpp.o
+
+src/object.i: src/object.cpp.i
+
+.PHONY : src/object.i
+
+# target to preprocess a source file
+src/object.cpp.i:
+	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/src/object.cpp.i
+.PHONY : src/object.cpp.i
+
+src/object.s: src/object.cpp.s
+
+.PHONY : src/object.s
+
+# target to generate assembly for a file
+src/object.cpp.s:
+	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/src/object.cpp.s
+.PHONY : src/object.cpp.s
+
 src/raster.o: src/raster.cpp.o
 
 .PHONY : src/raster.o
@@ -219,6 +246,9 @@ help:
 	@echo "... src/mesh_loader.o"
 	@echo "... src/mesh_loader.i"
 	@echo "... src/mesh_loader.s"
+	@echo "... src/object.o"
+	@echo "... src/object.i"
+	@echo "... src/object.s"
 	@echo "... src/raster.o"
 	@echo "... src/raster.i"
 	@echo "... src/raster.s"

@@ -1197,6 +1197,24 @@ Eigen/Core
 -
 raster.h
 /home/ameduri/course_work/computer-graphics/simulator/src/raster.h
+object.h
+/home/ameduri/course_work/computer-graphics/simulator/src/object.h
+
+/home/ameduri/course_work/computer-graphics/simulator/src/object.cpp
+Eigen/Geometry
+-
+object.h
+/home/ameduri/course_work/computer-graphics/simulator/src/object.h
+
+/home/ameduri/course_work/computer-graphics/simulator/src/object.h
+iostream
+-
+vector
+-
+Eigen/Core
+-
+attributes.h
+/home/ameduri/course_work/computer-graphics/simulator/src/attributes.h
 
 /home/ameduri/course_work/computer-graphics/simulator/src/raster.cpp
 raster.h

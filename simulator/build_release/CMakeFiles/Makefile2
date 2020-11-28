@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/ameduri/course_work/computer-graphics/simulator/build_r
 CMakeFiles/simulator.dir/all:
 	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/depend
 	$(MAKE) -f CMakeFiles/simulator.dir/build.make CMakeFiles/simulator.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles --progress-num=1,2,3,4 "Built target simulator"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles --progress-num=1,2,3,4,5 "Built target simulator"
 .PHONY : CMakeFiles/simulator.dir/all
 
 # Include target in all.
@@ -76,7 +76,7 @@ all: CMakeFiles/simulator.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/simulator.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles 5
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/simulator.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/ameduri/course_work/computer-graphics/simulator/build_release/CMakeFiles 0
 .PHONY : CMakeFiles/simulator.dir/rule

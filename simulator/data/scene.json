@@ -18,10 +18,17 @@
 		"specular": [0.2, 0.2, 0.2],
 		"exp": 256.0
 	},
-	"render_gif" : true,
+	"render_gif" : false,
 	"objects": [
 		{
-			"path": "bunny.off"
+			"path": "sphere.off",
+			"type": "sphere",
+			"fixed": false
+		},
+		{
+			"path": "box.off",
+			"type": "box",
+			"fixed": true
 		}
 	]
 }

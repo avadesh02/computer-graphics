@@ -92,41 +92,15 @@ int main()
 	};
 
 	// initialising camera attributes before rendering mesh
-	// TODO: check the frame buffer initialization  
-	uniform.camera.position << 0.25,0.0,-3;
-	uniform.camera.gaze_direction << 0,0,1;
-	uniform.camera.view_up << 0,1,0;
-	uniform.camera.field_of_view = (50.0/180.0)*M_PI;
-	uniform.camera.is_perspective = false;
-	uniform.draw_wireframe = false;
-	uniform.flat_shading = true;
-	uniform.per_vertex_shading = false;
+	std::string file_name = "../data/scene.json" ;
+	vector<MatrixXd> V_arr;
+	vector<MatrixXi> F_arr;
+	vector<MatrixXf> V_p_arr;
+	vector<vector<VertexAttributes>> vertices_mesh_arr;
+	vector<vector<VertexAttributes>> vertices_lines_arr;
 
-	uniform.color << 1,0,0,1;
-	uniform.light_source << 0,0,-2;
-	uniform.diffuse_color << 0.4, 0.4, 0.4;
-	uniform.specular_color << 0.2, 0.2, 0.2;
-	uniform.specular_exponent = 265.0;
-	uniform.ambient_color << 0.2, 0.2, 0.2;
-
-	uniform.render_gif = false;
-
-	// loading the mesh
-	MatrixXd V;
-	MatrixXi F;
-	std::string filename = "../data/box.off" ;
-	MatrixXf V_p;
-	
-	// pushing triangle information into vertices
-	vector<VertexAttributes> vertices_mesh;
-	// pushing line information into vertices
-	vector<VertexAttributes> vertices_lines;
-	
-	load_off(filename, V, F);
-
-	compute_normals(V, F, V_p, vertices_mesh, vertices_lines, uniform);
-
-	compute_transformation_matrices(V, frameBuffer.cols(), frameBuffer.rows(), uniform);
+	load_scene(file_name, uniform, V_arr, F_arr, V_p_arr, vertices_mesh_arr, vertices_lines_arr, 
+				frameBuffer.cols(), frameBuffer.rows());
 
 	if (uniform.render_gif){
 		MatrixXf trans = MatrixXf::Identity(4, 4);
@@ -153,22 +127,23 @@ int main()
 
 			uniform.bc_rot_tran = trans * rot * trans_minus;
 			// translates object after rotation
-			translate[0] += -0.001;
-			translate[1] += -0.001;
 
 			trans.col(3).head(3) = translate;
 			uniform.bc_rot_tran = trans * uniform.bc_rot_tran;
 
 			frameBuffer.setConstant(FrameBufferAttributes());
-			if (uniform.flat_shading || uniform.per_vertex_shading)
-			{
-				rasterize_triangles(program, uniform, vertices_mesh, frameBuffer);
-			}
-			if (uniform.draw_wireframe)
-			{
-				rasterize_lines(program, uniform, vertices_lines, 1.0, frameBuffer);
-			}
+			for (unsigned i = 0; i < vertices_mesh_arr.size(); i++){
+				if (uniform.flat_shading || uniform.per_vertex_shading)
+				{
+					rasterize_triangles(program, uniform, vertices_mesh_arr[i], frameBuffer);
+				}
+				if (uniform.draw_wireframe)
+				{
+					rasterize_lines(program, uniform, vertices_lines_arr[i], 1.0, frameBuffer);
+				}
 
+			}
+			
 			framebuffer_to_uint8(frameBuffer, image);
 			GifWriteFrame(&g, image.data(), frameBuffer.rows(), frameBuffer.cols(), delay);
 		}
@@ -178,14 +153,18 @@ int main()
 	}
 	else{
 		uniform.bc_rot_tran = MatrixXf::Identity(4, 4);
-		uniform.bc_rot_tran *= 0.25;
-		if (uniform.flat_shading || uniform.per_vertex_shading)
-		{
-			rasterize_triangles(program, uniform, vertices_mesh, frameBuffer);
+		for (unsigned i = 0; i < vertices_mesh_arr.size(); i++){
+			if (uniform.flat_shading || uniform.per_vertex_shading)
+			{
+				rasterize_triangles(program, uniform, vertices_mesh_arr[i], frameBuffer);
+			}
+			if (uniform.draw_wireframe)
+			{
+				rasterize_lines(program, uniform, vertices_lines_arr[i], 1.0, frameBuffer);
+			}
+
 		}
-		if (uniform.draw_wireframe){
-			rasterize_lines(program, uniform, vertices_lines, 1.0, frameBuffer);
-		}
+			
 	}
 	
 	

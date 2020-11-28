@@ -112,7 +112,7 @@ int main()
 	uniform.camera.gaze_direction << 0,0,1;
 	uniform.camera.view_up << 0,1,0;
 	uniform.camera.field_of_view = (50.0/180.0)*M_PI;
-	uniform.camera.is_perspective = true;
+	uniform.camera.is_perspective = false;
 	uniform.draw_wireframe = false;
 	uniform.flat_shading = true;
 	uniform.per_vertex_shading = false;
@@ -124,7 +124,7 @@ int main()
 	uniform.specular_exponent = 265.0;
 	uniform.ambient_color << 0.2, 0.2, 0.2;
 
-	uniform.render_gif = false;
+	uniform.render_gif = true;
 
 	// loading the mesh
 	MatrixXd V;

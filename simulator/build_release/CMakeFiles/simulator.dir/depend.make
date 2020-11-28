@@ -214,6 +214,7 @@ CMakeFiles/simulator.dir/src/main.cpp.o: ../../ext/eigen/Eigen/src/plugins/Commo
 CMakeFiles/simulator.dir/src/main.cpp.o: ../../ext/eigen/Eigen/src/plugins/MatrixCwiseBinaryOps.h
 CMakeFiles/simulator.dir/src/main.cpp.o: ../../ext/eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h
 CMakeFiles/simulator.dir/src/main.cpp.o: ../../ext/gif-h/gif.h
+CMakeFiles/simulator.dir/src/main.cpp.o: ../../ext/json/json.hpp
 CMakeFiles/simulator.dir/src/main.cpp.o: ../../ext/stb/stb_image_write.h
 CMakeFiles/simulator.dir/src/main.cpp.o: ../src/attributes.h
 CMakeFiles/simulator.dir/src/main.cpp.o: ../src/main.cpp
@@ -432,6 +433,7 @@ CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../../ext/eigen/Eigen/src/plugin
 CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../../ext/eigen/Eigen/src/plugins/CommonCwiseUnaryOps.h
 CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../../ext/eigen/Eigen/src/plugins/MatrixCwiseBinaryOps.h
 CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../../ext/eigen/Eigen/src/plugins/MatrixCwiseUnaryOps.h
+CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../../ext/json/json.hpp
 CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../src/attributes.h
 CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../src/mesh_loader.cpp
 CMakeFiles/simulator.dir/src/mesh_loader.cpp.o: ../src/mesh_loader.h

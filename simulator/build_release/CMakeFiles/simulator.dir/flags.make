@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG   -std=gnu++11
 
 CXX_DEFINES = -DDATA_DIR=\"/home/ameduri/course_work/computer-graphics/simulator/data/\"
 
-CXX_INCLUDES = -isystem /home/ameduri/course_work/computer-graphics/simulator/../ext/eigen -isystem /home/ameduri/course_work/computer-graphics/simulator/../ext/gif-h -isystem /home/ameduri/course_work/computer-graphics/simulator/../ext/stb 
+CXX_INCLUDES = -isystem /home/ameduri/course_work/computer-graphics/simulator/../ext/eigen -isystem /home/ameduri/course_work/computer-graphics/simulator/../ext/stb -isystem /home/ameduri/course_work/computer-graphics/simulator/../ext/gif-h -isystem /home/ameduri/course_work/computer-graphics/simulator/../ext/json 
 

@@ -1,0 +1,27 @@
+{
+	"camera":
+	{
+		"position": [0.25,0.0,-3],
+		"gaze_direction": [0,0,1],
+		"view_up": [0,1,0],
+		"field_view": 10,
+		"is_perspective": false,
+		"draw_wireframe": false,
+		"flat_shading": true,
+		"per_vertex_shading" : false
+	},
+	"lights": 
+	{
+		"source": [0.0,0.0,-2.0],
+		"ambient": [0.2, 0.2, 0.2],
+		"diffuse": [0.4, 0.4, 0.4],
+		"specular": [0.2, 0.2, 0.2],
+		"exp": 256.0
+	},
+	"render_gif" : true,
+	"objects": [
+		{
+			"path": "bunny.off"
+		}
+	]
+}

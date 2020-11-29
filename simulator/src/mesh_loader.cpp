@@ -19,6 +19,30 @@ void load_off(const std::string &filename, MatrixXd &V, MatrixXi &F) {
 	}
 }
 
+void compute_camera_angle(UniformAttributes &uniform){
+	double ax, ay, az;
+	Vector3f gaze_dir = -uniform.camera.position.head(3).cast<float> ();
+	ax = acos((gaze_dir.dot(Vector3f::UnitX()))/gaze_dir.norm());
+	ay = acos((gaze_dir.dot(Vector3f::UnitY()))/gaze_dir.norm());
+	az = acos((gaze_dir.dot(Vector3f::UnitZ()))/gaze_dir.norm());
+
+	MatrixXf rot_x = MatrixXf::Identity(4, 4);
+	rot_x(1, 1) = cos(ax);
+	rot_x(1, 2) = -sin(ax);
+	rot_x(2, 2) = cos(ax);
+	rot_x(2, 1) = sin(ax);
+
+	MatrixXf rot_y = MatrixXf::Identity(4, 4);
+	rot_y(0, 0) = cos(ax);
+	rot_y(0, 2) = sin(ax);
+	rot_y(2, 2) = cos(ax);
+	rot_y(2, 0) = -sin(ax);
+
+	uniform.bc_rot_tran = Matrix4f::Identity();
+
+
+}
+
 void load_scene(const std::string &filename, UniformAttributes& uniform, vector<Object> &objects, Integrator &integrator){
 	json data;
 	std::ifstream in(filename);
@@ -35,9 +59,10 @@ void load_scene(const std::string &filename, UniformAttributes& uniform, vector<
 
 
 	uniform.camera.position = read_vec3d(data["camera"]["position"]);
-	uniform.camera.gaze_direction  = read_vec3d(data["camera"]["gaze_direction"]);
-	uniform.camera.view_up = read_vec3d(data["camera"]["view_up"]);
+	uniform.camera.gaze_direction  = read_vec3d(data["camera"]["gaze_direction"]).normalized();
+	uniform.camera.view_up = read_vec3d(data["camera"]["view_up"]).normalized();
 	uniform.camera.field_of_view = data["camera"]["field_view"];
+	uniform.camera.field_of_view *= (M_PI/180.0);
 	uniform.camera.is_perspective = data["camera"]["is_perspective"];
 	uniform.draw_wireframe = data["camera"]["draw_wireframe"];
 	uniform.flat_shading = data["camera"]["flat_shading"];
@@ -172,6 +197,7 @@ void compute_transformation_matrices(vector<Object> &objects, double frameBuffer
 					u[2], v[2], w[2], uniform.camera.position[2],
 					0, 0, 0, 1;
 
+
 	uniform.M_cam = tmp.inverse();
 
 	// compututing transformation from camera view to cannoincal view volume
@@ -186,50 +212,28 @@ void compute_transformation_matrices(vector<Object> &objects, double frameBuffer
 	}
 	//  making the box slightly bigger than the bounding box so that 
 	// the bunny does not fill up the entire space
-	lbn_world(0) -= 0.1;
-	lbn_world(1) -= 0.1;
-	lbn_world(2) -= 0.1;
+	uniform.lbn(0) = -3.5;
+	uniform.lbn(1) = -3.5;
+	uniform.lbn(2) = -0.5;
 	
-	rtf_world(0) += 0.1;
-	rtf_world(1) += 0.1;
-	rtf_world(2) += 0.1;
+	uniform.rtf(0) = 3.5;
+	uniform.rtf(1) = 3.5;
+	uniform.rtf(2) = -3.5;
 
 	// tranforming from world to camera frame
-	uniform.lbn = (uniform.M_cam*lbn_world).head(3);
-	uniform.rtf = (uniform.M_cam*rtf_world).head(3);
-	
-	// computing M_orth
-	// not doing (n - f) here since, the bounded box limits are already transformed to the right axis before while
-	// transforming the bounding box from the world frame to the camera frame
-	if (uniform.camera.is_perspective)
-	{
-		// to do for perspective
-		uniform.rtf(1) = std::abs(uniform.lbn(0))*tan(uniform.camera.field_of_view/2);
-		uniform.rtf(0) = (1.0*frameBuffer_cols/frameBuffer_rows)*uniform.rtf(1);
-		// uniform.rtf(2) = -2*uniform.lbn(2);
-		uniform.P << uniform.lbn(2), 0, 0, 0,
-			0, uniform.lbn(2), 0, 0,
-			0, 0, uniform.lbn(2) + uniform.rtf(2), -uniform.lbn(2) * uniform.rtf(2), 
-			0, 0, 1, 0;
-	}
-	
+	// uniform.lbn = (uniform.M_cam*lbn_world).head(3);
+	// uniform.rtf = (uniform.M_cam*rtf_world).head(3);
+		
 	uniform.M_orth << 2/(uniform.rtf(0) - uniform.lbn(0)), 0, 0, -(uniform.rtf(0) + uniform.lbn(0))/(uniform.rtf(0) - uniform.lbn(0)),
 				0, 2/(uniform.rtf(1) - uniform.lbn(1)), 0, -(uniform.rtf(1) + uniform.lbn(1))/(uniform.rtf(1) - uniform.lbn(1)),
 				0, 0, 2/(uniform.lbn(2) - uniform.rtf(2)), -(uniform.rtf(2) + uniform.lbn(2))/(uniform.lbn(2) - uniform.rtf(2)),
 				0, 0, 0, 1;
 	
-	if (uniform.camera.is_perspective){
-		uniform.M_orth = uniform.M_orth*uniform.P;
-	}
-
+	
 	// M_vp is not computed as it is carried out in the rasterize triangle part
 	// M_object to world is assumed to be identity 
 	uniform.M = uniform.M_orth*uniform.M_cam;
-	// storing the inverse to tranform normals computed at each vertex into the canonical view volume space
-	Vector4f camera_location;
-	camera_location << uniform.light_source(0), uniform.light_source(1), uniform.light_source(2), 1;
-
-
+	// cout << uniform.M << endl;
 	// Add a transformation to compensate for the aspect ratio of the framebuffer
 	float aspect_ratio = float(frameBuffer_cols)/float(frameBuffer_rows);
 

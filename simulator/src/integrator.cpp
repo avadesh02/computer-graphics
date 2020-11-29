@@ -14,7 +14,6 @@ void Integrator::step(vector<Object> &objects){
                         Vector3f contact_force;
                         if (check_collision(objects[i], objects[j], contact_force)){
                             objects[i].velocity += contact_force*dt;
-                            // cerr << contact_force << endl;
                         };
                         
                     }
@@ -36,10 +35,9 @@ bool Integrator::check_collision(Object & object_1, Object & object_2, Vector3f 
                 for (unsigned i = 0; i < 3; i ++){
                     for (int j = -1; j < 2; j += 2){
                         float plane;
-                        plane = object_2.center_loc[i] + j*(object_2.box.sizes()[i]);
-                        if(std::abs(object_1.center_loc[i] - plane) < object_1.box.sizes()[0]){
-                            Vector3f deflection;
-                            contact_force[i] = kp[i]*(object_1.center_loc[i] - j*object_1.box.sizes()[0]);
+                        plane = object_2.center_loc[i] + j*(object_2.box.sizes()[i])/2.0;
+                        if(std::abs(object_1.center_loc[i] - plane) < 0.5*std::abs(object_1.box.sizes()[0])){
+                            contact_force[i] = -kp[i]*(object_1.center_loc[i] + j*0.5*object_1.box.sizes()[0] - plane);
                             contact_force[i] -= kd[i]*object_1.velocity[i]; 
                             return true;
                         }

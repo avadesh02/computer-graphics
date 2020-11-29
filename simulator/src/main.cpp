@@ -42,12 +42,12 @@ int main()
 		}
 		transformed_vector[3] = 1;
 		transformed_normal[3] = 1;
-		transformed_vector = uniform.view*transformed_vector;
+		transformed_vector = uniform.view*uniform.bc_rot_tran * transformed_vector;
 
-		transformed_normal = transformed_normal;
+		transformed_normal = (uniform.bc_rot_tran.inverse()).transpose()* transformed_normal;
 
 		Vector3f Li = -(uniform.light_source - transformed_vector.head(3)).normalized();
-		Vector3f bisector = ((uniform.light_source - transformed_vector.head(3)) - ((uniform.camera.position).cast<float> () - transformed_vector.head(3))).normalized();
+		Vector3f bisector = -((uniform.light_source - transformed_vector.head(3)) - ((uniform.camera.position).cast<float> () - transformed_vector.head(3))).normalized();
 		Vector3f diffuse, specular, color;
 		diffuse = uniform.diffuse_color * std::max(Li.dot(transformed_normal.head(3)), float(0.0));
 		// implement specular
@@ -81,7 +81,7 @@ int main()
 	program.BlendingShader = [](const FragmentAttributes& fa, const FrameBufferAttributes& previous)
 	{
 		// implementation of the z buffer
-		if (fa.depth < previous.depth){
+		if (fa.depth > previous.depth){
 			FrameBufferAttributes out(fa.color[0]*255, fa.color[1]*255, fa.color[2]*255, fa.color[3]*255);
 			out.depth = fa.depth;
 			return out;
@@ -98,53 +98,33 @@ int main()
 	
 	load_scene(file_name, uniform, objects, integrator);
 	compute_normals(objects, uniform);
+
 	compute_transformation_matrices(objects,frameBuffer.cols(),frameBuffer.rows(), uniform);
 
 	objects[0].resize_object(0.2, 0.2, 0.2);
-	objects[0].translate_object(-0.4, 0.6, 0);
+	objects[0].translate_object(-0.4, 0.8, 0.2);
 
 	objects[1].resize_object(0.2, 0.2, 0.2);
-	objects[1].translate_object(0.4, 0.6, 0);
+	objects[1].translate_object(0.0, 0.8, 0);
 
-
-	objects[2].resize_object(2.0, 0.1, 1.0);
+	objects[2].resize_object(5.0, 0.3, 2.0);
 	objects[2].translate_object(0.0, -0.3, 0);
 
-	if (uniform.render_gif){
-		MatrixXf trans = MatrixXf::Identity(4, 4);
-		MatrixXf trans_minus = MatrixXf::Identity(4, 4);
-		MatrixXf rot = MatrixXf::Identity(4, 4);
-		Vector3f translate;
-		translate.setZero();
-		const char *fileName = "simulator.gif";
-		vector<uint8_t> image;
-		int delay = 2;
-		GifWriter g;
-		GifBegin(&g, fileName, frameBuffer.rows(), frameBuffer.cols(), delay);
-		for (float i = 0; i < integrator.T; i += 1)
-		{
-			integrator.step(objects);
-			frameBuffer.setConstant(FrameBufferAttributes());
-			for (unsigned i = 0; i < objects.size(); i++){
-				if (uniform.flat_shading || uniform.per_vertex_shading)
-				{
-					rasterize_triangles(program, uniform, objects[i].vertices_mesh, frameBuffer);
-				}
-				if (uniform.draw_wireframe)
-				{
-					rasterize_lines(program, uniform, objects[i].vertices_lines, 1.0, frameBuffer);
-				}
 
-			}
-			
-			framebuffer_to_uint8(frameBuffer, image);
-			GifWriteFrame(&g, image.data(), frameBuffer.rows(), frameBuffer.cols(), delay);
-		}
+	compute_camera_angle(uniform);
 
-		GifEnd(&g);
-		return 0;
-	}
-	else{
+	const char *fileName = "simulator.gif";
+	vector<uint8_t> image;
+	int delay = 2;
+	GifWriter g;
+	GifBegin(&g, fileName, frameBuffer.rows(), frameBuffer.cols(), delay);
+	for (float i = 0; i < integrator.T; i += 1)
+	{
+		// integrates the simulation by one step
+
+		integrator.step(objects);
+
+		frameBuffer.setConstant(FrameBufferAttributes());
 		for (unsigned i = 0; i < objects.size(); i++){
 			if (uniform.flat_shading || uniform.per_vertex_shading)
 			{
@@ -155,12 +135,12 @@ int main()
 				rasterize_lines(program, uniform, objects[i].vertices_lines, 1.0, frameBuffer);
 			}
 
-		}		
+		}
+		
+		framebuffer_to_uint8(frameBuffer, image);
+		GifWriteFrame(&g, image.data(), frameBuffer.rows(), frameBuffer.cols(), delay);
 	}
-	
-	vector<uint8_t> image;
-	framebuffer_to_uint8(frameBuffer,image);
-	stbi_write_png("simulator.png", frameBuffer.rows(), frameBuffer.cols(), 4, image.data(), frameBuffer.rows()*4);
-	
+
+	GifEnd(&g);
 	return 0;
 }

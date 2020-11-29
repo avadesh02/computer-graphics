@@ -31,4 +31,5 @@ void compute_transformation_matrices(vector<Object> &objects, double frameBuffer
 
 void load_scene(const std::string &filename, UniformAttributes& uniform, vector<Object> &objects, Integrator &integrator);
 
+void compute_camera_angle(UniformAttributes &uniform);
 

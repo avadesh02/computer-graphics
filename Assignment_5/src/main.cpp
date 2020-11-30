@@ -108,18 +108,18 @@ int main()
 
 	// initialising camera attributes before rendering mesh
 	// TODO: check the frame buffer initialization  
-	uniform.camera.position << 0.25,0.0,-3;
+	uniform.camera.position << 0.35,0.05,-3;
 	uniform.camera.gaze_direction << 0,0,1;
 	uniform.camera.view_up << 0,1,0;
 	uniform.camera.field_of_view = (50.0/180.0)*M_PI;
 	uniform.camera.is_perspective = false;
-	uniform.draw_wireframe = false;
+	uniform.draw_wireframe = true;
 	uniform.flat_shading = true;
 	uniform.per_vertex_shading = false;
 
 	uniform.color << 1,0,0,1;
-	uniform.light_source << 0,0,-2;
-	uniform.diffuse_color << 0.4, 0.4, 0.4;
+	uniform.light_source << 0, 0, -2;
+	uniform.diffuse_color << 0.8, 0.2, 0.2;
 	uniform.specular_color << 0.2, 0.2, 0.2;
 	uniform.specular_exponent = 265.0;
 	uniform.ambient_color << 0.2, 0.2, 0.2;
@@ -334,6 +334,7 @@ int main()
 	}
 	else{
 		uniform.bc_rot_tran = MatrixXf::Identity(4, 4);
+		frameBuffer.setConstant(FrameBufferAttributes());
 		if (uniform.flat_shading || uniform.per_vertex_shading)
 		{
 			rasterize_triangles(program, uniform, vertices_mesh, frameBuffer);

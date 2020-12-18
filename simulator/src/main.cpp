@@ -111,7 +111,7 @@ int main()
 	for (float i = 0; i < integrator.T; i += 1)
 	{
 		// integrates the simulation by one step
-		theta += 0.002; 
+		theta += 0.001; 
 		phi += 0.001;
 		uniform.camera.position[0] = r*sin(phi); 
 		uniform.camera.position[1] = r*sin(theta)*cos(phi); 

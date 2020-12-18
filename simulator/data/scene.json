@@ -15,15 +15,15 @@
 		"ambient": [0.0, 0.0, 0.0],
 		"diffuse": [0.8, 0.8, 0.8],
 		"specular": [0.2, 0.2, 0.2],
-		"exp": 10.0
+		"exp": 1.0
 	},
 	"render_gif" : true,
 	"integrator":
 	{
 		"T": 800,
 		"dt": 0.001,
-		"kp": [10000, 20000, 10000],
-		"kd": [20, 20, 20],
+		"kp": [10000, 30000, 10000],
+		"kd": [100, 500, 100],
 		"g": [0,-9.81,0]
 	},
 	"objects": [
@@ -39,7 +39,7 @@
 		{
 			"path": "sphere.off",
 			"type": "sphere",
-			"mass": 40.0,
+			"mass": 20.0,
 			"diffuse": [0.8, 0.3, 0.3],
 			"scale": [0.2, 0.2, 0.2],
 			"translate": [0.4, 0.5, 0.0],
@@ -48,7 +48,7 @@
 		{
 			"path": "sphere.off",
 			"type": "sphere",
-			"mass": 100.0,
+			"mass": 30.0,
 			"diffuse": [0.0, 0.3, 0.8],
 			"scale": [0.2, 0.2, 0.2],
 			"translate": [1.5, 0.8, 0.0],
@@ -57,7 +57,7 @@
 		{
 			"path": "sphere.off",
 			"type": "sphere",
-			"mass": 200.0,
+			"mass": 50.0,
 			"diffuse": [0.0, 0.8, 0.2],
 			"scale": [0.5, 0.5, 0.5],
 			"translate": [-2.0, 0.9, -0.2],
@@ -68,7 +68,7 @@
 			"type": "box",
 			"mass": 1.0,
 			"diffuse": [0.8, 0.8, 0.3],
-			"scale": [7.0, 0.2, 2.0],
+			"scale": [7.0, 0.4, 2.0],
 			"translate": [0.0, -0.3, 0.0],
 			"fixed": true
 		}

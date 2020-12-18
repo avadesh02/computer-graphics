@@ -7,6 +7,7 @@ void Integrator::step(vector<Object> &objects){
     for (unsigned i = 0; i < objects.size(); i ++){
         if (!objects[i].is_fixed){
             if (objects[i].is_sphere){
+                // first order euler integration scheme
                 objects[i].displacement = objects[i].velocity*dt;
                 objects[i].velocity += objects[i].mass*g*dt;
                 for (unsigned j = 0; j < objects.size(); j ++){
@@ -19,6 +20,7 @@ void Integrator::step(vector<Object> &objects){
                     }
                 }
             }
+            // updating location of object 
             objects[i].translate_object(objects[i].displacement[0], 
                         objects[i].displacement[1], objects[i].displacement[2]);
             objects[i].locate_center();
@@ -37,8 +39,11 @@ bool Integrator::check_collision(Object & object_1, Object & object_2, Vector3f 
                         float plane;
                         plane = object_2.center_loc[i] + j*(object_2.box.sizes()[i])/2.0;
                         if(std::abs(object_1.center_loc[i] - plane) < 0.5*std::abs(object_1.box.sizes()[0])){
-                            contact_force[i] = -kp[i]*(object_1.center_loc[i] + j*0.5*object_1.box.sizes()[0] - plane);
+                            // checking collision by plane
+                            contact_force[i] = kp[i]*(object_1.center_loc[i] + j*0.5*object_1.box.sizes()[0] - plane);
                             contact_force[i] -= kd[i]*object_1.velocity[i]; 
+                            // unilaterality of forces
+                            contact_force[i] = std::max(contact_force[i], float(0.0));
                             return true;
                         }
                     }

@@ -22,8 +22,13 @@ void Object::translate_object(float px, float py, float pz){
             0, 0, 1, pz,
             0, 0, 0, 1;
     box.setEmpty();
+    Matrix4f t_inv = (translate.transpose().inverse());
+    Vector4f normal; 
+    normal << 0,0,0,1;
     for (unsigned i = 0; i < vertices_mesh.size(); i ++){
         vertices_mesh[i].position = translate*vertices_mesh[i].position;
+        normal.head(3) = vertices_mesh[i].normal.head(3);
+        vertices_mesh[i].normal = (t_inv*normal).head(3);
         box.extend(vertices_mesh[i].position.head(3));
     }
 };

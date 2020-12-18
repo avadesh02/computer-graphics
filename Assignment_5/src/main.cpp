@@ -56,21 +56,19 @@ int main()
 		}
 		transformed_vector[3] = 1;
 		transformed_normal[3] = 1;
-		transformed_vector = uniform.view*uniform.bc_rot_tran * transformed_vector;
+		transformed_vector = uniform.view*uniform.bc_rot_tran* transformed_vector;
 
-		transformed_normal = (uniform.bc_rot_tran.inverse()).transpose()* transformed_normal;
-
+		transformed_normal = (uniform.bc_rot_tran.transpose()).inverse()* transformed_normal;
+		// cout << transformed_normal << '\n';
 		Vector3f Li = (uniform.light_source - transformed_vector.head(3)).normalized();
-		Vector3f bisector = ((uniform.light_source - transformed_vector.head(3)) - ((uniform.camera.position).cast<float> () - transformed_vector.head(3))).normalized();
+		Vector3f bisector = ((uniform.light_source - transformed_vector.head(3)) + ((uniform.camera.position).cast<float> () - transformed_vector.head(3))).normalized();
 		Vector3f diffuse, specular, color;
 		diffuse = uniform.diffuse_color * std::max(Li.dot(transformed_normal.head(3)), float(0.0));
 		// implement specular
 		specular = uniform.specular_color * pow(std::max(transformed_normal.head(3).dot(bisector), float(0.0)), uniform.specular_exponent);
 
 		color = uniform.ambient_color + diffuse + specular;
-
 		// rotating the object and translating around the barycenter
-		// cout << transformed_vector[3] << '\n';
 		
 		transformed_vector = uniform.M*transformed_vector;
 		// transforming normal at the vertex into the canonical view volume space
@@ -113,18 +111,18 @@ int main()
 	uniform.camera.view_up << 0,1,0;
 	uniform.camera.field_of_view = (50.0/180.0)*M_PI;
 	uniform.camera.is_perspective = false;
-	uniform.draw_wireframe = true;
+	uniform.draw_wireframe = false;
 	uniform.flat_shading = true;
 	uniform.per_vertex_shading = false;
 
 	uniform.color << 1,0,0,1;
-	uniform.light_source << 0, 0, -2;
-	uniform.diffuse_color << 0.8, 0.2, 0.2;
-	uniform.specular_color << 0.2, 0.2, 0.2;
-	uniform.specular_exponent = 265.0;
-	uniform.ambient_color << 0.2, 0.2, 0.2;
+	uniform.light_source << 0, 2, 0;
+	uniform.diffuse_color << 0.8, 0.1, 0.1;
+	uniform.specular_color << 0.2, 0.1, 0.1;
+	uniform.specular_exponent = 1.0;
+	uniform.ambient_color << 0.1, 0.05, 0.05;
 
-	uniform.render_gif = true;
+	uniform.render_gif = false;
 
 	// loading the mesh
 	MatrixXd V;
@@ -154,9 +152,9 @@ int main()
 		// computing average normal at each vertex for per vertex shading
 		// normalising of the entire normal is done at line 194
 		{
-			V_p.row(F(i, 0)) += (u.cross(v)).normalized();
-			V_p.row(F(i, 1)) += (u.cross(v)).normalized();
-			V_p.row(F(i, 2)) += (u.cross(v)).normalized();
+			V_p.row(F(i, 0)) += (-u.cross(v)).normalized();
+			V_p.row(F(i, 1)) += (-u.cross(v)).normalized();
+			V_p.row(F(i, 2)) += (-u.cross(v)).normalized();
 		}
 	}
 
@@ -173,24 +171,32 @@ int main()
 			if(uniform.draw_wireframe){
 				if (j == 0){
 					vertices_lines.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
+					// setting normals to zero since a normal to a line is not defined os ligthing is constant
+					vertices_lines[vertices_lines.size()-1].normal = V_p.row(F(i,j)).normalized();
 				}
 				else{
 					vertices_lines.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
+					// setting normals to zero since a normal to a line is not defined os ligthing is constant
+					vertices_lines[vertices_lines.size()-1].normal = V_p.row(F(i,j)).normalized();
 					vertices_lines.push_back(VertexAttributes(V(F(i,j),0),V(F(i,j),1),V(F(i,j),2)));
+					// setting normals to zero since a normal to a line is not defined os ligthing is constant
+					vertices_lines[vertices_lines.size()-1].normal = V_p.row(F(i,j)).normalized();
 				}
 			}
 		}
 		if (uniform.draw_wireframe){
 			vertices_lines.push_back(VertexAttributes(V(F(i,0),0),V(F(i,0),1),V(F(i,0),2)));
+			vertices_lines[vertices_lines.size()-1].normal = V_p.row(F(i,0)).normalized();
+
 		}
 		if (uniform.flat_shading){
 			// computing the face normals
 			Vector3f u,v;
 			u = vertices_mesh[3*i].position.head(3) - vertices_mesh[3*i + 1].position.head(3); 
 			v = vertices_mesh[3*i + 2].position.head(3) - vertices_mesh[3*i + 1].position.head(3);
-			vertices_mesh[3*i].normal = (u.cross(v)).normalized(); 
-			vertices_mesh[3*i+1].normal = (u.cross(v)).normalized(); 
-			vertices_mesh[3*i+2].normal = (u.cross(v)).normalized(); 
+			vertices_mesh[3*i].normal = (-u.cross(v)).normalized(); 
+			vertices_mesh[3*i+1].normal = (-u.cross(v)).normalized(); 
+			vertices_mesh[3*i+2].normal = (-u.cross(v)).normalized(); 
 		}
 		if (uniform.per_vertex_shading){
 			// normalizing the normals at each vertex 
@@ -309,7 +315,7 @@ int main()
 
 			uniform.bc_rot_tran = trans * rot * trans_minus;
 			// translates object after rotation
-			translate[0] += -0.001;
+			translate[0] += -0.001;	
 			translate[1] += -0.001;
 
 			trans.col(3).head(3) = translate;
@@ -322,7 +328,7 @@ int main()
 			}
 			if (uniform.draw_wireframe)
 			{
-				rasterize_lines(program, uniform, vertices_lines, 1.0, frameBuffer);
+				rasterize_lines(program, uniform, vertices_lines, 0.5, frameBuffer);
 			}
 
 			framebuffer_to_uint8(frameBuffer, image);
@@ -340,7 +346,7 @@ int main()
 			rasterize_triangles(program, uniform, vertices_mesh, frameBuffer);
 		}
 		if (uniform.draw_wireframe){
-			rasterize_lines(program, uniform, vertices_lines, 1.0, frameBuffer);
+			rasterize_lines(program, uniform, vertices_lines, 0.5, frameBuffer);
 		}
 	}
 	

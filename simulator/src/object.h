@@ -28,7 +28,8 @@ struct Object{
     Vector3f displacement; // the amount the object has moved from its initial location
     Vector3f velocity;
     AlignedBox3f box; // used to compute collision and location
-
+    Vector3f diffuse; // diffuse color of object
+    
     double mass;
 
     void resize_object(float sx, float sy, float sz);

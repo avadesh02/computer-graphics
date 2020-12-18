@@ -1,9 +1,8 @@
 {
 	"camera":
 	{
-		"position": [0.0,0.8,-2],
-		"gaze_direction": [0.0,-0.8,2],
-		"view_up": [0.0,0.5,2],
+		"position": [0.0, 1, 10],
+		"view_up": [0.0,1.0,0],
 		"field_view": 30,
 		"is_perspective": false,
 		"draw_wireframe": false,
@@ -12,16 +11,16 @@
 	},
 	"lights": 
 	{
-		"source": [2.0, 2, -0.2],
-		"ambient": [0.2, 0.2, 0.2],
+		"source": [2.0, 2, 2],
+		"ambient": [0.0, 0.0, 0.0],
 		"diffuse": [0.8, 0.8, 0.8],
-		"specular": [0.5, 0.5, 0.5],
-		"exp": 100.0
+		"specular": [0.2, 0.2, 0.2],
+		"exp": 10.0
 	},
 	"render_gif" : true,
 	"integrator":
 	{
-		"T": 300,
+		"T": 800,
 		"dt": 0.001,
 		"kp": [10000, 20000, 10000],
 		"kd": [20, 20, 20],
@@ -31,19 +30,46 @@
 		{
 			"path": "sphere.off",
 			"type": "sphere",
-			"mass": 5.0,
+			"mass": 20.0,
+			"diffuse": [0.6, 0.0, 0.5],
+			"scale": [0.3, 0.3, 0.3],
+			"translate": [-0.6, 1.0, 0.2],
 			"fixed": false
 		},
 		{
 			"path": "sphere.off",
 			"type": "sphere",
-			"mass": 3.0,
+			"mass": 40.0,
+			"diffuse": [0.8, 0.3, 0.3],
+			"scale": [0.2, 0.2, 0.2],
+			"translate": [0.4, 0.5, 0.0],
+			"fixed": false
+		},
+		{
+			"path": "sphere.off",
+			"type": "sphere",
+			"mass": 100.0,
+			"diffuse": [0.0, 0.3, 0.8],
+			"scale": [0.2, 0.2, 0.2],
+			"translate": [1.5, 0.8, 0.0],
+			"fixed": false
+		},
+		{
+			"path": "sphere.off",
+			"type": "sphere",
+			"mass": 200.0,
+			"diffuse": [0.0, 0.8, 0.2],
+			"scale": [0.5, 0.5, 0.5],
+			"translate": [-2.0, 0.9, -0.2],
 			"fixed": false
 		},
 		{
 			"path": "box.off",
 			"type": "box",
 			"mass": 1.0,
+			"diffuse": [0.8, 0.8, 0.3],
+			"scale": [7.0, 0.2, 2.0],
+			"translate": [0.0, -0.3, 0.0],
 			"fixed": true
 		}
 	]

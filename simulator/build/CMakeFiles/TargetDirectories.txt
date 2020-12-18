@@ -1,0 +1,3 @@
+/home/ameduri/course_work/computer-graphics/simulator/build/CMakeFiles/rebuild_cache.dir
+/home/ameduri/course_work/computer-graphics/simulator/build/CMakeFiles/simulator.dir
+/home/ameduri/course_work/computer-graphics/simulator/build/CMakeFiles/edit_cache.dir

@@ -33,3 +33,4 @@ void load_scene(const std::string &filename, UniformAttributes& uniform, vector<
 
 void compute_camera_angle(UniformAttributes &uniform);
 
+void init_object(const std::string &filename, vector<Object> &objects);

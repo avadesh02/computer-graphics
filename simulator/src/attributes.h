@@ -57,7 +57,7 @@ class FrameBufferAttributes
 	}
 
 	Eigen::Matrix<uint8_t,4,1> color;
-	float depth = -2;
+	float depth = 2;
 };
 
 class UniformAttributes

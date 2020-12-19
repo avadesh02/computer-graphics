@@ -111,52 +111,26 @@ void compute_normal(Object& object, UniformAttributes & uniform){
     Vector3f traingle_center;
     object.V_p.resize(object.V.rows(), object.V.cols());
 	object.V_p.setZero();
-	double area = 0, triangle_area;
-    uniform.bary_center.setZero();
 	for (unsigned i = 0; i < object.F.rows(); i++){
 		Vector3f u, v;
 		// computing bary center of object
 		u = object.V.row((object.F(i, 0))).cast <float> () - object.V.row(object.F(i, 1)).cast <float> ();
 		v = object.V.row((object.F(i, 2))).cast <float> () - object.V.row(object.F(i, 1)).cast <float> ();
-		triangle_area = 0.5*(u.cross(v).norm());
-		traingle_center = (1/3.0)*(object.V.row((object.F(i, 0))).cast<float>() 
-			+ object.V.row(object.F(i, 1)).cast<float>() + object.V.row(object.F(i, 1)).cast<float>());
-		uniform.bary_center.head(3) += traingle_center*triangle_area;
-		area += triangle_area;
 
 		if (uniform.per_vertex_shading)
 		// computing average normal at each vertex for per vertex shading
 		// normalising of the entire normal is done at line 194
 		{
-			object.V_p.row(object.F(i, 0)) += (-u.cross(v)).normalized();
-			object.V_p.row(object.F(i, 1)) += (-u.cross(v)).normalized();
-			object.V_p.row(object.F(i, 2)) += (-u.cross(v)).normalized();
+			object.V_p.row(object.F(i, 0)) += (-u.cross(v));
+			object.V_p.row(object.F(i, 1)) += (-u.cross(v));
+			object.V_p.row(object.F(i, 2)) += (-u.cross(v));
 		}
 	}
-
-	uniform.bary_center.head(3) = uniform.bary_center.head(3)/area;
-	uniform.bary_center[3] = 1.0;
 
     for (unsigned i = 0; i < object.F.rows(); i++){
 		for (unsigned j = 0; j < object.F.cols(); j ++){
 			object.vertices_mesh.push_back(VertexAttributes(object.V(object.F(i,j),0)
 			,object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
-			if(uniform.draw_wireframe){
-				if (j == 0){
-					object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,j),0)
-					,object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
-				}
-				else{
-					object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,j),0),
-									object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
-					object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,j),0)
-								,object.V(object.F(i,j),1),object.V(object.F(i,j),2)));
-				}
-			}
-		}
-		if (uniform.draw_wireframe){
-			object.vertices_lines.push_back(VertexAttributes(object.V(object.F(i,0),0),
-				object.V(object.F(i,0),1),object.V(object.F(i,0),2)));
 		}
 		if (uniform.flat_shading){
 			// computing the face normals

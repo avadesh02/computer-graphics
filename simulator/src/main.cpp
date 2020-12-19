@@ -92,13 +92,13 @@ int main()
 	vector<Object> objects;
 
 	
-	load_scene(file_name, uniform, objects, integrator);
+	load_scene(file_name, uniform, objects, integrator);	
 	compute_normals(objects, uniform);
+	init_object(file_name, objects);
+
 
 	compute_transformation_matrices(objects,frameBuffer.cols(),frameBuffer.rows(), uniform);
 	
-	init_object(file_name, objects);
-
 	// camera params to rotate in a sphere
 	float r = 200;
 	float theta = 0;
@@ -111,8 +111,8 @@ int main()
 	for (float i = 0; i < integrator.T; i += 1)
 	{
 		// integrates the simulation by one step
-		theta += 0.001; 
-		phi += 0.001;
+		theta += 0.0008; 
+		phi += 0.0008;
 		uniform.camera.position[0] = r*sin(phi); 
 		uniform.camera.position[1] = r*sin(theta)*cos(phi); 
 		uniform.camera.position[2] = r*cos(theta)*cos(phi);

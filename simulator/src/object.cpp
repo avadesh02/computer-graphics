@@ -9,6 +9,9 @@ void Object::resize_object(float sx, float sy, float sz){
             0, 0, sz, 0,
             0, 0, 0, 1;
     box.setEmpty();
+    Vector4f normal;
+    Matrix4f t_inv = (scale.transpose().inverse()); 
+    normal << 0,0,0,1;
     for (unsigned i = 0; i < vertices_mesh.size(); i ++){
         vertices_mesh[i].position = scale*vertices_mesh[i].position;
         box.extend(vertices_mesh[i].position.head(3));

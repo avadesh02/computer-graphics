@@ -221,9 +221,9 @@ void compute_transformation_matrices(vector<Object> &objects, double frameBuffer
 	0, 0, 1, 0,
 	0, 0, 0, 1;
 
-	// if (aspect_ratio < 1)
-	// 	uniform.view(0,0) = aspect_ratio;
-	// else
-	// 	uniform.view(1,1) = 1/aspect_ratio;
+	if (aspect_ratio < 1)
+		uniform.view(0,0) = aspect_ratio;
+	else
+		uniform.view(1,1) = 1/aspect_ratio;
 };
 
